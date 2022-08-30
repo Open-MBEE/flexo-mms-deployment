@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  LDAP_BASE: dc=directory,dc=openmbee,dc=org
+  LDAP_GROUP_ATTRIBUTE: cn
+  LDAP_GROUP_NAMESPACE: ldap/group/
+  LDAP_GROUP_SEARCH_FILTER: (&(objectclass=group)(uniqueMember=%s)(|(%s)))
+  LDAP_GROUP_STORE_CONTEXT: https://mms5.openmbee.org/
+  LDAP_GROUP_STORE_URI: https://quadstore-location/sparql
+  LDAP_LOCATION: ldap://ldap.openmbee.org:636
+  LDAP_USER_NAMESPACE: ldap/user/
+  LDAP_USER_PATTERN: uid=%s,ou=personnel
+kind: ConfigMap
+metadata:
+  name: ldap-config
+  namespace: mms5

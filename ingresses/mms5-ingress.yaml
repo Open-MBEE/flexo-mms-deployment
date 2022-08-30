@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 256m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  name: mms-ingress
+  namespace: mms5
+spec:
+  rules:
+  - host: mms5.openmbee.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: mms5-layer-1-service
+            port:
+              number: 8080
+        path: /
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: mms5-auth-service
+            port:
+              number: 8080
+        path: /login
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - mms5.openmbee.org
+    secretName: mms5-cert

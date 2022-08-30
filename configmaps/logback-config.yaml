@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  logback.xml: |-
+    <included>
+        <appender name="GRAYLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+            <syslogHost>graylog.openmbee.org</syslogHost>
+            <port>1514</port>
+            <facility>LOCAL2</facility>
+        </appender>
+        <root level="DEBUG">
+            <appender-ref ref="GRAYLOG" />
+        </root>
+    </included>
+kind: ConfigMap
+metadata:
+  name: logback-config
+  namespace: mms5
