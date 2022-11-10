@@ -18,6 +18,6 @@ This will run the service set where you can then issue SPARQL queries directly a
 In order to run the tests, you can return to your root directory and run the following commands.
 ::
     cd..
-    BUILDKIT=0 docker build --network=mms5-test-network -t mms5-test:latest -f Dockerfile-Test .
-    docker run --network=mms5-test-network --name mms5-test-container mms5-test:latest
+    docker build -t mms5-test:latest -f Dockerfile .
+    docker run -p 8080:8080 --name mms5-test-container mms5-test:latest
     docker cp mms5-test-container:/application/build/reports/tests <directory you want to store results>/results
