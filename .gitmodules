@@ -1,0 +1,9 @@
+[submodule "mms5-layer1-service"]
+	path = mms5-layer1-service
+	url = git@github.com:Open-MBEE/mms5-layer1-service.git
+[submodule "mms5-auth-service"]
+	path = mms5-auth-service
+	url = git@github.com:Open-MBEE/mms5-auth-service.git
+[submodule "mms5-store-service"]
+	path = mms5-store-service
+	url = git@github.com:Open-MBEE/mms5-store-service.git
