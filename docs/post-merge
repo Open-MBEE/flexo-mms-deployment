@@ -4,8 +4,8 @@ import sys
 import os.path
 
 file_path = "mms5-layer1-service/src/main/resources/application.conf"
-if os.path.exists(file_path):
-    # open both files
+if not os.path.exists(file_path):
+    # open application.conf.example file
     app_example = "mms5-layer1-service/src/main/resources/application.conf.example"
     with open(file_path,'r') as firstfile, open(file_path,'w') as secondfile:
         # read content from first file
