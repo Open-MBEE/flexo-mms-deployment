@@ -34,6 +34,7 @@ jobs:
             rm -rf docs/mms5-layer1-service/ && mkdir docs/mms5-layer1-service
             echo "Converting $f to $filename.rst"
             pandoc mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst
+            cp -r mms5-layer1-service/docs docs/mms5-layer1-service
 
 workflows:
   version: 2
