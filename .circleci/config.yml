@@ -42,10 +42,10 @@ workflows:
       - prepare_repository:
           filters:
             branches:
-              only: /((release|hotfix|support)/[0-9.]+(-(a|b|rc)[0-9]+)?|develop)/
+              only: /((release|hotfix|support|wip)/[0-9.]+(-(a|b|rc)[0-9]+)?|develop)/
       - build_docs:
           requires:
             - prepare_repository
           filters:
             branches:
-              only: /((release|hotfix|support)/[0-9.]+(-(a|b|rc)[0-9]+)?|develop)/
+              only: /((release|hotfix|support|wip)/[0-9.]+(-(a|b|rc)[0-9]+)?|develop)/
