@@ -1,0 +1,14 @@
+name: Add To GitHub projects
+on:
+  issues:
+    types:
+      - opened
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.4.0
+        with:
+          project-url: https://github.com/orgs/Open-MBEE/projects/2
+          github-token: ${{ secrets.ADD_TO_PROJECT_ACTION_PAT }}
