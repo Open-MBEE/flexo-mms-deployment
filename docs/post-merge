@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import sys
+import os.path
+
+file_path = "mms5-layer1-service/src/main/resources/application.conf"
+if not os.path.exists(file_path) or os.stat(file_path).st_size == 0:
+    # open application.conf.example file
+    app_example = "mms5-layer1-service/src/main/resources/application.conf.example"
+    with open(app_example,'r') as firstfile, open(file_path,'w') as secondfile:
+        # read content from first file
+        for line in firstfile:
+                 # append content to second file
+                 secondfile.write(line)
+
+
