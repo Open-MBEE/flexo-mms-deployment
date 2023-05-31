@@ -1,0 +1,51 @@
+version: 2.1
+orbs:
+  node: circleci/node@5.0.2
+
+jobs:
+  prepare_repository:
+    machine:
+      image: ubuntu-2204:2022.10.2
+    working_directory: /home/circleci/mms5-deployment
+    steps:
+      - checkout
+      - run:
+          name: Checkout Submodules
+          shell: /bin/bash
+          command: |
+            git submodule sync --recursive
+            git submodule update --recursive --init
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - mms5-deployment/*
+  build_docs:
+    machine:
+      image: ubuntu-2204:2022.10.2
+    working_directory: /home/circleci/mms5-deployment
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Pull docs from submodules
+          shell: /bin/bash
+          command: |
+            sudo apt-get install pandoc
+            rm -rf docs/mms5-layer1-service/ && mkdir docs/mms5-layer1-service
+            echo "Converting $f to $filename.rst"
+            pandoc mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst
+
+workflows:
+  version: 2
+  build-docs:
+    jobs:
+      - prepare_repository:
+          filters:
+            branches:
+              only: /((release|hotfix|support|wip)/[0-9.]+(-(a|b|rc)[0-9]+)?|develop)/
+      - build_docs:
+          requires:
+            - prepare_repository
+          filters:
+            branches:
+              only: /((release|hotfix|support|wip)/[0-9.]+(-(a|b|rc)[0-9]+)?|develop)/
