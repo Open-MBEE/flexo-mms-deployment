@@ -15,11 +15,10 @@ jobs:
           cp -r local/* docs/
           mkdir -p docs/mms5-layer1-service
           ls -lah .
-          ls -lah ./submodules
-          ls -lah ./submodules/mms5-layer1-service
       - uses: docker://pandoc/core:2.9
         with:
-          args: "./submodules/mms5-layer1-service/README.md -t rst -o ./docs/mms5-layer1-service/index.rst"
+          args: "README.md -t rst -o README.rst"
+          # args: "./submodules/mms5-layer1-service/README.md -t rst -o ./docs/mms5-layer1-service/index.rst"
   deploy:
     needs: build
     permissions:
