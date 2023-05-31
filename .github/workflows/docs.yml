@@ -14,7 +14,7 @@ jobs:
           mkdir -p docs
           cp -r local/* docs/
           mkdir -p docs/mms5-layer1-service
-          chmod 755 submodules/mms5-layer1-service/README.md
+          chmod -R 755 submodules/
       - uses: docker://pandoc/core:3
         with:
           args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
