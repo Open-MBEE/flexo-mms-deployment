@@ -1,0 +1,32 @@
+name: Build and Deploy Docs
+on:
+  push:
+    branches:
+      - wip/layer1-docs
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        submodules: recursive
+      - run: |
+          mkdir -p docs
+          cp -r local/* docs/
+          mkdir -p docs/mms5-layer1-service
+      - uses: docker://pandoc/core:2.9
+        with:
+          args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy
+        id: deploymment
+        uses: actions/deploy-pages@v2
+
