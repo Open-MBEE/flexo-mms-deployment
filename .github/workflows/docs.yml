@@ -18,15 +18,14 @@ jobs:
       - uses: docker://pandoc/core:3
         with:
           args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
-      - run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          git --no-pager branch -av
-          git checkout -b build/docs
-          git pull
-          git add docs
-          git commit -m 'docs: actions build'
-          git push
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: docs
+          fetch: true
+          message: 'docs: build'
+          new_branch: build/docs
+          push: true
+
   # deploy:
   #   needs: build
   #   permissions:
