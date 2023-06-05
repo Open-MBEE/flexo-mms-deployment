@@ -18,17 +18,24 @@ jobs:
       - uses: docker://pandoc/core:3
         with:
           args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
-  deploy:
-    needs: build
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: deploy
-        id: deploymment
-        uses: actions/deploy-pages@v2
+      - run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git switch build/docs
+          git add docs
+          git commit -m 'docs: actions build'
+          git push
+  # deploy:
+  #   needs: build
+  #   permissions:
+  #     pages: write
+  #     id-token: write
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: deploy
+  #       id: deploymment
+  #       uses: actions/deploy-pages@v2
 
