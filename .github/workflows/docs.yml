@@ -21,7 +21,9 @@ jobs:
       - run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git checkout build/docs
+          git --no-pager branch -av
+          git checkout -b build/docs
+          git pull
           git add docs
           git commit -m 'docs: actions build'
           git push
