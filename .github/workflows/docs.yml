@@ -15,6 +15,7 @@ jobs:
           cp -r local/* docs/
           mkdir -p docs/mms5-layer1-service
           chmod -R 755 submodules/
+          rm .gitignore
       - uses: docker://pandoc/core:3
         with:
           args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
