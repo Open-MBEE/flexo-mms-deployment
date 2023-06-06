@@ -19,14 +19,22 @@ jobs:
       - uses: docker://pandoc/core:3
         with:
           args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
-      - uses: EndBug/add-and-commit@v9
-        with:
-          add: docs
-          fetch: true
-          message: 'docs: build'
-          new_branch: build/docs
-          # pull: '--rebase --autostash'
-          push: true
+      - run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@noreply.github.com"
+          git checkout -b build/docs
+          git add docs/
+          git commit -m 'build: docs'
+          git push -u origin build/docs
+
+      # - uses: EndBug/add-and-commit@v9
+      #   with:
+      #     add: docs
+      #     fetch: true
+      #     message: 'docs: build'
+      #     new_branch: build/docs
+      #     # pull: '--rebase --autostash'
+      #     push: true
 
   # deploy:
   #   needs: build
