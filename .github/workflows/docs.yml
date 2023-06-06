@@ -25,6 +25,7 @@ jobs:
           git checkout -b build/docs
           git add docs/
           git commit -m 'build: docs'
+          git stash
           git submodule update --init --recursive
           git pull --rebase --recurse-submodules
           git submodule update --force --recursive --init --remote
