@@ -25,6 +25,7 @@ jobs:
           fetch: true
           message: 'docs: build'
           new_branch: build/docs
+          pull: '--rebase --autostash'
           push: true
 
   # deploy:
