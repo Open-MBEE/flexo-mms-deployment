@@ -23,9 +23,10 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@noreply.github.com"
           git checkout -b build/docs
+          git pull origin build/docs
           git add docs/
           git commit -m 'build: docs'
-          git push -u origin deployed/docs
+          git push -u origin build/docs
 
       # - uses: EndBug/add-and-commit@v9
       #   with:
