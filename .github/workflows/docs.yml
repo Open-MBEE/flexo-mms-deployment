@@ -22,8 +22,8 @@ jobs:
       - run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@noreply.github.com"
+          git push origin --delete build/docs
           git checkout -b build/docs
-          git pull origin build/docs
           git add docs/
           git commit -m 'build: docs'
           git push -u origin build/docs
