@@ -25,7 +25,7 @@ jobs:
           git checkout -b build/docs
           git add docs/
           git commit -m 'build: docs'
-          git push -u origin build/docs
+          git push -u origin deployed/docs
 
       # - uses: EndBug/add-and-commit@v9
       #   with:
