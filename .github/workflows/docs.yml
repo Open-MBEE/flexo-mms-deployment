@@ -25,16 +25,6 @@ jobs:
           git checkout -b build/docs
           git add docs/
           git commit -m 'build: docs'
-          git stash
-          echo "> git submodule update --init --recursive"
-          git submodule update --init --recursive
-          echo "> git pull --rebase --recurse-submodules"
-          git pull --rebase --recurse-submodules
-          echo "> git submodule update --force --recursive --init --remote"
-          git submodule update --force --recursive --init --remote
-          echo "> git submodule sync"
-          git submodule sync
-          git submodule update --init --recursive
           git push -u origin build/docs
 
       # - uses: EndBug/add-and-commit@v9
