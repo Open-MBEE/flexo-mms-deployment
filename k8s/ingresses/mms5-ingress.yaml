@@ -31,4 +31,4 @@ spec:
   tls:
   - hosts:
     - mms5.openmbee.org
-    secretName: mms5-cert
+    secretName: mms5
