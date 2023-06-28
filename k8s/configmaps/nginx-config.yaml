@@ -1,0 +1,176 @@
+apiVersion: v1
+data:
+  mms5.conf: |-
+    ## start server mms5.jpl.nasa.gov
+     server {
+             server_name mms5.jpl.nasa.gov ;
+    
+             listen 80 proxy_protocol ;
+             listen 443 proxy_protocol http2 ;
+    
+             set $proxy_upstream_name "-";
+    
+             location = /login {
+    
+                     set $namespace      "mms5";
+                     set $ingress_name   "mms-ingress";
+                     set $service_name   "mms5-auth-service";
+                     set $service_port   "8080";
+                     set $location_path  "/login";
+                     set $global_rate_limit_exceeding n;
+    
+                     port_in_redirect off;
+    
+                     set $balancer_ewma_score -1;
+                     set $proxy_upstream_name "mms5-mms5-auth-service-8080";
+                     set $proxy_host          $proxy_upstream_name;
+                     set $pass_access_scheme  $scheme;
+    
+                     set $pass_server_port    $proxy_protocol_server_port;
+    
+                     set $best_http_host      $http_host;
+                     set $pass_port           $pass_server_port;
+    
+                     set $proxy_alternative_upstream_name "";
+    
+                     client_max_body_size                    256m;
+    
+                     proxy_set_header Host                   $best_http_host;
+    
+                     # Pass the extracted client certificate to the backend
+    
+                     # Allow websocket connections
+                     proxy_set_header                        Upgrade           $http_upgrade;
+        
+                     proxy_set_header X-Real-IP              $remote_addr;
+    
+                     proxy_set_header X-Forwarded-For        $remote_addr;
+    
+                     proxy_set_header X-Forwarded-Host       $best_http_host;
+                     proxy_set_header X-Forwarded-Port       $pass_port;
+                     proxy_set_header X-Forwarded-Proto      $pass_access_scheme;
+                     proxy_set_header X-Forwarded-Scheme     $pass_access_scheme;
+    
+                     proxy_set_header X-Scheme               $pass_access_scheme;
+    
+                     # Pass the original X-Forwarded-For
+                     proxy_set_header X-Original-Forwarded-For $http_x_forwarded_for;
+    
+                     # mitigate HTTPoxy Vulnerability
+                     # https://www.nginx.com/blog/mitigating-the-httpoxy-vulnerability-with-nginx/
+                     proxy_set_header Proxy                  "";
+    
+                     # Custom headers to proxied server
+    
+                     proxy_connect_timeout                   600s;
+                     proxy_send_timeout                      3600s;
+                     proxy_read_timeout                      3600s;
+    
+                     proxy_buffering                         off;
+                     proxy_buffer_size                       4k;
+                     proxy_buffers                           4 4k;
+    
+                     proxy_max_temp_file_size                1024m;
+    
+                     proxy_request_buffering                 on;
+                     proxy_http_version                      1.1;
+    
+                     proxy_cookie_domain                     off;
+                     proxy_cookie_path                       off;
+    
+                     # In case of errors try the next upstream server before returning an error
+                     proxy_next_upstream                     error timeout;
+                     proxy_next_upstream_timeout             600s;
+                     proxy_next_upstream_tries               3;
+    
+                     proxy_pass http://$service_name.$namespace.svc.cluster.local;
+    
+                     proxy_redirect                          off;
+    
+            }
+    
+            location / {
+    
+                     set $namespace      "mms5";
+                     set $ingress_name   "mms-ingress";
+                     set $service_name   "mms5-layer-1-service";
+                     set $service_port   "8080";
+                     set $location_path  "/";
+                     set $global_rate_limit_exceeding n;
+    
+                     port_in_redirect off;
+    
+                     set $balancer_ewma_score -1;
+                     set $proxy_upstream_name "mms5-mms5-layer-1-service-8080";
+                     set $proxy_host          $proxy_upstream_name;
+                     set $pass_access_scheme  $scheme;
+    
+                     set $pass_server_port    $proxy_protocol_server_port;
+    
+                     set $best_http_host      $http_host;
+                     set $pass_port           $pass_server_port;
+    
+                     set $proxy_alternative_upstream_name "";
+    
+                     client_max_body_size                    256m;
+    
+                     proxy_set_header Host                   $best_http_host;
+    
+                     # Pass the extracted client certificate to the backend
+    
+                     # Allow websocket connections
+                     proxy_set_header                        Upgrade           $http_upgrade;
+        
+                     proxy_set_header X-Real-IP              $remote_addr;
+    
+                     proxy_set_header X-Forwarded-For        $remote_addr;
+    
+                     proxy_set_header X-Forwarded-Host       $best_http_host;
+                     proxy_set_header X-Forwarded-Port       $pass_port;
+                     proxy_set_header X-Forwarded-Proto      $pass_access_scheme;
+                     proxy_set_header X-Forwarded-Scheme     $pass_access_scheme;
+    
+                     proxy_set_header X-Scheme               $pass_access_scheme;
+    
+                     # Pass the original X-Forwarded-For
+                     proxy_set_header X-Original-Forwarded-For $http_x_forwarded_for;
+    
+                     # mitigate HTTPoxy Vulnerability
+                     # https://www.nginx.com/blog/mitigating-the-httpoxy-vulnerability-with-nginx/
+                     proxy_set_header Proxy                  "";
+    
+                     # Custom headers to proxied server
+    
+                     proxy_connect_timeout                   600s;
+                     proxy_send_timeout                      3600s;
+                     proxy_read_timeout                      3600s;
+    
+                     proxy_buffering                         off;
+                     proxy_buffer_size                       4k;
+                     proxy_buffers                           4 4k;
+    
+                     proxy_max_temp_file_size                1024m;
+    
+                     proxy_request_buffering                 on;
+                     proxy_http_version                      1.1;
+    
+                     proxy_cookie_domain                     off;
+                     proxy_cookie_path                       off;
+    
+                     # In case of errors try the next upstream server before returning an error
+                     proxy_next_upstream                     error timeout;
+                     proxy_next_upstream_timeout             600s;
+                     proxy_next_upstream_tries               3;
+    
+                     proxy_pass http://$service_name.$namespace.svc.cluster.local;
+    
+                     proxy_redirect                          off;
+    
+             }
+    
+     }
+     ## end server mms5.jpl.nasa.gov
+kind: ConfigMap
+metadata:
+  name: mms5-proxy-conf
+  namespace: mms5
