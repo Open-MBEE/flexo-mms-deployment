@@ -1,7 +1,7 @@
 Setting up the MMS5-Layer1 Service on Mac
 ==========================================
 
-This document explains how to set up the local dev environment for Mac machines. 
+This document explains how to set up the local dev environment for Mac machines.
 
 This tutorial assumes that you have already installed Docker, NodeJS and NPX onto your machine.
 
