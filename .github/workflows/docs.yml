@@ -2,7 +2,7 @@ name: Build and Deploy Docs
 on:
   push:
     branches:
-      - wip/layer1-docs
+      - develop
 jobs:
   build:
     runs-on: ubuntu-latest
