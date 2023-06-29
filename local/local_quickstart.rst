@@ -1,12 +1,12 @@
 Setting up the MMS5-Layer1 Service on Mac
 ==========================================
 
-This document explains how to set up the local dev environment for Mac machines.
+This document explains how to set up the local dev environment for Mac machines. 
 
 This tutorial assumes that you have already installed Docker, NodeJS and NPX onto your machine.
 
 After pulling this repo into your machine, you will need to go to the directory where the repository is located and run the following command:
-:: 
+::
     docker-compose -f src/test/resources/docker-compose.yml up -d
 
 This will run the service set where you can then issue SPARQL queries directly against the quadstore. After doing this, you will need to run the following commands:
