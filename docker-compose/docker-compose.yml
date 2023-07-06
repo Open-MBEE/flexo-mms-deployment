@@ -24,7 +24,9 @@ services:
     image: atomgraph/fuseki:4.6
     hostname: quad-server
     container_name: quad-server
-    command: --mem --update /ds
+    command: --file=/tmp/mount/cluster.trig /ds
+    volumes:
+      - ${PWD}/mount:/tmp/mount
     ports:
       - 3030:3030
 
