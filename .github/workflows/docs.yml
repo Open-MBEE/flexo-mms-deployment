@@ -2,7 +2,7 @@ name: Build and Deploy Docs
 on:
   push:
     branches:
-      - wip/layer1-docs
+      - develop
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,9 +16,10 @@ jobs:
           mkdir -p docs/mms5-layer1-service
           chmod -R 755 submodules/
           rm .gitignore
-      - uses: docker://pandoc/core:3
-        with:
-          args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
+          cp -r submodules/mms5-layer1-service/docs/* docs/mms5-layer1-service/
+      #- uses: docker://pandoc/core:3
+      #  with:
+      #    args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
       - run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@noreply.github.com"
