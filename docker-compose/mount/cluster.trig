@@ -21,9 +21,11 @@ graph m-graph:AccessControl.Agents {
 	m-user:anon a mms:User ;
 		mms:id "anon" .
 
-	m-user:user01 a mms:User ;
-	    mms:group m-group:SuperAdmins ;
-    	mms:id "user01" .
+	<http://layer1-service/users/ldap/user/user01> a mms:User ;
+    	mms:id "ldap/user/user01" .
+
+    <http://layer1-service/groups/ldap/group/group01> a mms:Group ;
+        mms:id "ldap/group/group01" .
 
 	m-group:SuperAdmins a mms:Group ;
 		mms:id "super_admins" .
@@ -32,7 +34,7 @@ graph m-graph:AccessControl.Agents {
 # default policies
 graph m-graph:AccessControl.Policies {
 	m-policy:DefaultSuperAdmins a mms:Policy ;
-		mms:subject m-user:root, m-group:SuperAdmins ;
+		mms:subject m-user:root, m-group:SuperAdmins, <http://layer1-service/users/ldap/user/user01>, <http://layer1-service/groups/ldap/group/group01> ;
 		mms:scope <http://layer1-service/> ;
 		mms:role mms-object:Role.AdminCluster, mms-object:Role.AdminOrg, mms-object:Role.AdminRepo, mms-object:Role.AdminMetadata, mms-object:Role.AdminModel, mms-object:Role.AdminAccessControlAny .
 }

@@ -22,6 +22,6 @@ The following user / passwords are created by default:
 
 ## MMS5 Authenticating
 
-The first step will be the retrieve an authentication token from the auth-service. 
+The first step will be the retrieve an authentication token from the auth-service, with `password1`. 
 
-`curl -u user01 -X GET http://$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' auth-service):8080/login`
+`curl -u user01 -X GET http://localhost:8082/login`
