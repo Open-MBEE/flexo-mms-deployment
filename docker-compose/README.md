@@ -1,11 +1,11 @@
-# mms5 docker-compose
+# MMS5 docker-compose
 
 ## What is this?
 This docker-compose will start all services required for all current MMS5 microservices. It utilizes the following open source services in the backend:
 
-- OpenLDAP
-- Apache Fuseki
-- MinIO
+- OpenLDAP - for Auth Service
+- Apache Fuseki - Quadstore
+- MinIO - for Store Service
 
 With these initial services, the docker-compose will then start and connect the following MMS5 microservices:
 
@@ -13,15 +13,27 @@ With these initial services, the docker-compose will then start and connect the 
 - MMS5 Store Service
 - MMS5 Layer 1 Service
 
-All services will be on a bridged docker network named `mms5-network`. 
+All services will be on a bridged docker network named `mms5-network`.
+
+An initial trig file has been pre-generated under `mount/cluster.trig` and will be automatically added to Fuseki when it starts up. This includes policies that adds the default ldap users and group created to be admins.
 
 ## Default MMS5 Users and Groups
 The following user / passwords are created by default:
 - `user01` / `password1`
 - `user02` / `password2`
 
-## MMS5 Authenticating
+## Usage
+Install Docker Desktop from https://www.docker.com/
+
+Run `docker-compose up` in this directory, once something like the following appears, the MMS5 api should be ready.
+
+    layer1-service   | 2023-07-09T21:39:48,468Z [main] INFO  Application - Responding at http://0.0.0.0:8080
 
 The first step will be the retrieve an authentication token from the auth-service, with `password1`. 
 
 `curl -u user01 -X GET http://localhost:8082/login`
+
+You can now use the token returned as a bearer token for all subsequent mms5-layer1 api calls to http://localhost:8080, for api documentation, see https://www.openmbee.org/mms5-layer1-openapi/
+
+## Shutdown
+`Ctrl-C` from the terminal and run `docker-compose down` once all containers are shut down.
