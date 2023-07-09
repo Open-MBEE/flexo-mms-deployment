@@ -17,6 +17,8 @@ All services will be on a bridged docker network named `mms5-network`.
 
 An initial trig file has been pre-generated under `mount/cluster.trig` and will be automatically added to Fuseki when it starts up. This includes policies that adds the default ldap users and group created to be admins.
 
+For MinIO, a client can be installed to inspect objects https://min.io/docs/minio/linux/reference/minio-mc.html?ref=docs
+
 ## Default MMS5 Users and Groups
 The following user / passwords are created by default:
 - `user01` / `password1`
