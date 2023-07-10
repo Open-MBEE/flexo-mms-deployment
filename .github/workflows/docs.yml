@@ -14,9 +14,13 @@ jobs:
           mkdir -p docs
           cp -r local/* docs/
           mkdir -p docs/mms5-layer1-service
+          mkdir -p docs/mms5-auth-service
+          mkdir -p docs/mms5-store-service
           chmod -R 755 submodules/
           rm .gitignore
           cp -r submodules/mms5-layer1-service/docs/* docs/mms5-layer1-service/
+          cp -r submodules/mms5-auth-service/docs/* docs/mms5-auth-service/
+          cp -r submodules/mms5-store-service/docs/* docs/mms5-store-service/
       #- uses: docker://pandoc/core:3
       #  with:
       #    args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
