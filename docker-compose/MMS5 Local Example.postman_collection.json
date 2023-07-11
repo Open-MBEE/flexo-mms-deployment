@@ -1,0 +1,345 @@
+{
+	"info": {
+		"_postman_id": "81427dda-84d3-4938-8fbe-eb335542b684",
+		"name": "MMS5 Local Example",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7302261"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.collectionVariables.set(\"token\", jsonData.token);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password1",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "user01",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create org",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "text/turtle",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<> dct:title \"testorg\"@en ."
+				},
+				"url": {
+					"raw": "{{host}}/orgs/testorg",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create repo",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/turtle",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<> dct:title \"testrepo\"@en ."
+				},
+				"url": {
+					"raw": "{{host}}/orgs/testorg/repos/testrepo",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg",
+						"repos",
+						"testrepo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "load model",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "text/turtle",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "@prefix : <https://mms.openmbee.org/demos/people/>\n@prefix foaf: <http://xmlns.com/foaf/0.1/>\n\n:Bob a :Person ;\n    foaf:name \"Bob\" .\n:fluff a :Cat ;\n    :owner :Bob ;\n    :likes :jelly ;\n    foaf:name \"fluff\" ."
+				},
+				"url": {
+					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/graph",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg",
+						"repos",
+						"testrepo",
+						"branches",
+						"master",
+						"graph"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "query model",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/sparql-query",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "prefix foaf: <http://xmlns.com/foaf/0.1/>\nprefix : <https://mms.openmbee.org/demos/people/>\n\n        select ?name where {\n            ?s a :Person .\n            ?s foaf:name ?name .\n        }"
+				},
+				"url": {
+					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/query",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg",
+						"repos",
+						"testrepo",
+						"branches",
+						"master",
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "text/turtle",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<> dct:title \"new branch\"@en .\n<> mms:ref <./master> ."
+				},
+				"url": {
+					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/newbranch",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg",
+						"repos",
+						"testrepo",
+						"branches",
+						"newbranch"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update master model",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/sparql-update",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "prefix : <https://mms.openmbee.org/demos/people/>\nprefix foaf: <http://xmlns.com/foaf/0.1/>\n\ninsert data {\n    :Alice a :Person ;\n        foaf:name \"Alice\" ;\n        .\n\n    :Rex a :Dog ;\n        :owner :Alice ;\n        :likes :PeanutButter ;\n        foaf:name \"Rex\" ;\n        .\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/update",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg",
+						"repos",
+						"testrepo",
+						"branches",
+						"master",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "query repo",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/sparl-query",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "select ?ref ?commit ?time where {\n\t?ref mms:commit ?commit .\n\t?commit mms:submitted  ?time\n} "
+				},
+				"url": {
+					"raw": "{{host}}/orgs/testorg/repos/testrepo/query",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg",
+						"repos",
+						"testrepo",
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get model from branch",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/graph",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"testorg",
+						"repos",
+						"testrepo",
+						"branches",
+						"master",
+						"graph"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

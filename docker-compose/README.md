@@ -37,5 +37,7 @@ The first step will be the retrieve an authentication token from the auth-servic
 
 You can now use the token returned as a bearer token for all subsequent mms5-layer1 api calls to http://localhost:8080, for api documentation, see https://www.openmbee.org/mms5-layer1-openapi/
 
+An example Postman collection is available in this directory that demonstrates basic api usage. Download the Postman app from https://www.postman.com/ and import the collection file to use.
+
 ## Shutdown
 `Ctrl-C` from the terminal and run `docker-compose down` once all containers are shut down.
