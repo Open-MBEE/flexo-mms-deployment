@@ -39,5 +39,9 @@ You can now use the token returned as a bearer token for all subsequent mms5-lay
 
 An example Postman collection is available in this directory that demonstrates basic api usage. Download the Postman app from https://www.postman.com/ and import the collection file to use.
 
+## Connecting Jupyter Notebook Quick Start
+
+    docker run -p 8888:8888 --network=mms5-test-network jupyter/scipy-notebook:latest
+
 ## Shutdown
 `Ctrl-C` from the terminal and run `docker-compose down` once all containers are shut down.
