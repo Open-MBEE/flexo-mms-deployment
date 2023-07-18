@@ -43,7 +43,7 @@ An example Postman collection is available in this directory that demonstrates b
 
     docker run -p 8888:8888 --network=mms5-test-network jupyter/scipy-notebook:latest
 
-Example of using python `request` lib to call the login url (note the host should be the host defined in the docker-compose file)
+Example of using python `requests` lib to call the login url (note the host should be the host defined in the docker-compose file)
 
 ```python
 import requests
