@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "81427dda-84d3-4938-8fbe-eb335542b684",
+		"_postman_id": "d6083295-94a9-4df0-8113-8fd098be55c1",
 		"name": "MMS5 Local Example",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "7302261"
+		"_exporter_id": "19024498"
 	},
 	"item": [
 		{
@@ -69,16 +69,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "<> dct:title \"testorg\"@en ."
+					"raw": "<> dct:title \"openmbee\"@en ."
 				},
 				"url": {
-					"raw": "{{host}}/orgs/testorg",
+					"raw": "{{host}}/orgs/openmbee",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg"
+						"openmbee"
 					]
 				}
 			},
@@ -97,18 +97,18 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "<> dct:title \"testrepo\"@en ."
+					"raw": "<> dct:title \"hackathon\"@en ."
 				},
 				"url": {
-					"raw": "{{host}}/orgs/testorg/repos/testrepo",
+					"raw": "{{host}}/orgs/openmbee/repos/hackathon",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg",
+						"openmbee",
 						"repos",
-						"testrepo"
+						"hackathon"
 					]
 				}
 			},
@@ -126,19 +126,21 @@
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": "@prefix : <https://mms.openmbee.org/demos/people/>\n@prefix foaf: <http://xmlns.com/foaf/0.1/>\n\n:Bob a :Person ;\n    foaf:name \"Bob\" .\n:fluff a :Cat ;\n    :owner :Bob ;\n    :likes :jelly ;\n    foaf:name \"fluff\" ."
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
 				},
 				"url": {
-					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/graph",
+					"raw": "{{host}}/orgs/openmbee/repos/hackathon/branches/master/graph",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg",
+						"openmbee",
 						"repos",
-						"testrepo",
+						"hackathon",
 						"branches",
 						"master",
 						"graph"
@@ -160,18 +162,18 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "prefix foaf: <http://xmlns.com/foaf/0.1/>\nprefix : <https://mms.openmbee.org/demos/people/>\n\n        select ?name where {\n            ?s a :Person .\n            ?s foaf:name ?name .\n        }"
+					"raw": "prefix gnisf: <http://gnis-ld.org/lod/gnis/feature/>\nprefix gnisfa: <http://gnis-ld.org/lod/gnis/feature-alias/>\nprefix gniso: <http://gnis-ld.org/lod/gnis/ontology/>\nprefix gnisg: <http://gnis-ld.org/geometry/point/>\nprefix owl: <http://www.w3.org/2002/07/owl#>\nprefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nprefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nprefix geosparql: <http://www.opengis.net/ont/geosparql#>\nprefix xsd: <http://www.w3.org/2001/XMLSchema#>\n\nselect * {\n  ?s ?p ?o\n} limit 10\n"
 				},
 				"url": {
-					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/query",
+					"raw": "{{host}}/orgs/openmbee/repos/hackathon/branches/master/query",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg",
+						"openmbee",
 						"repos",
-						"testrepo",
+						"hackathon",
 						"branches",
 						"master",
 						"query"
@@ -196,15 +198,15 @@
 					"raw": "<> dct:title \"new branch\"@en .\n<> mms:ref <./master> ."
 				},
 				"url": {
-					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/newbranch",
+					"raw": "{{host}}/orgs/openmbee/repos/hackathon/branches/newbranch",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg",
+						"openmbee",
 						"repos",
-						"testrepo",
+						"hackathon",
 						"branches",
 						"newbranch"
 					]
@@ -225,18 +227,18 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "prefix : <https://mms.openmbee.org/demos/people/>\nprefix foaf: <http://xmlns.com/foaf/0.1/>\n\ninsert data {\n    :Alice a :Person ;\n        foaf:name \"Alice\" ;\n        .\n\n    :Rex a :Dog ;\n        :owner :Alice ;\n        :likes :PeanutButter ;\n        foaf:name \"Rex\" ;\n        .\n}"
+					"raw": "prefix gnisf: <http://gnis-ld.org/lod/gnis/feature/>\nprefix gnisfa: <http://gnis-ld.org/lod/gnis/feature-alias/>\nprefix gniso: <http://gnis-ld.org/lod/gnis/ontology/>\nprefix gnisg: <http://gnis-ld.org/geometry/point/>\nprefix owl: <http://www.w3.org/2002/07/owl#>\nprefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nprefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nprefix geosparql: <http://www.opengis.net/ont/geosparql#>\nprefix xsd: <http://www.w3.org/2001/XMLSchema#>\n\nprefix : <https://mms.openmbee.org/demos/hackathon/>\nprefix foaf: <http://xmlns.com/foaf/0.1/>\nprefix geonames: <http://www.geonames.org/ontology#>\n\ninsert data {\n  :INCOSE_IS_2023 geonames:locatedIn gnisfa:Hawaii .\n}"
 				},
 				"url": {
-					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/update",
+					"raw": "{{host}}/orgs/openmbee/repos/hackathon/branches/master/update",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg",
+						"openmbee",
 						"repos",
-						"testrepo",
+						"hackathon",
 						"branches",
 						"master",
 						"update"
@@ -261,15 +263,15 @@
 					"raw": "select ?ref ?commit ?time where {\n\t?ref mms:commit ?commit .\n\t?commit mms:submitted  ?time\n} "
 				},
 				"url": {
-					"raw": "{{host}}/orgs/testorg/repos/testrepo/query",
+					"raw": "{{host}}/orgs/openmbee/repos/hackathon/query",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg",
+						"openmbee",
 						"repos",
-						"testrepo",
+						"hackathon",
 						"query"
 					]
 				}
@@ -282,15 +284,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/orgs/testorg/repos/testrepo/branches/master/graph",
+					"raw": "{{host}}/orgs/openmbee/repos/hackathon/branches/master/graph",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"orgs",
-						"testorg",
+						"openmbee",
 						"repos",
-						"testrepo",
+						"hackathon",
 						"branches",
 						"master",
 						"graph"
