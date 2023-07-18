@@ -13,7 +13,7 @@ With these initial services, the docker-compose will then start and connect the 
 - MMS5 Store Service
 - MMS5 Layer 1 Service
 
-All services will be on a bridged docker network named `mms5-network`.
+All services will be on a bridged docker network named `mms5-test-network`.
 
 An initial trig file has been pre-generated under `mount/cluster.trig` and will be automatically added to Fuseki when it starts up. This includes policies that adds the default ldap users and group created to be admins.
 
@@ -42,6 +42,15 @@ An example Postman collection is available in this directory that demonstrates b
 ## Connecting Jupyter Notebook Quick Start
 
     docker run -p 8888:8888 --network=mms5-test-network jupyter/scipy-notebook:latest
+
+Example of using python `request` lib to call the login url (note the host should be the host defined in the docker-compose file)
+
+```python
+import requests
+from requests.auth import HTTPBasicAuth
+response = requests.get("http://auth-service:8080/login", auth=HTTPBasicAuth('user01', 'password1'))
+print(response.json())
+```
 
 ## Shutdown
 `Ctrl-C` from the terminal and run `docker-compose down` once all containers are shut down.
