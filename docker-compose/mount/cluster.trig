@@ -24,6 +24,9 @@ graph m-graph:AccessControl.Agents {
 	<http://layer1-service/users/ldap/user/user01> a mms:User ;
     	mms:id "ldap/user/user01" .
 
+    <http://layer1-service/users/ldap/user/user02> a mms:User ;
+        mms:id "ldap/user/user02" .
+
     <http://layer1-service/groups/ldap/group/group01> a mms:Group ;
         mms:id "ldap/group/group01" .
 

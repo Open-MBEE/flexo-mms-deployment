@@ -300,6 +300,34 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "add user02 as org admin policy",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "text/turtle",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "prefix mms-object: <https://mms.openmbee.org/rdf/objects/>\n\n\n<> mms:subject <http://layer1-service/users/ldap/user/user02> ;\n    mms:scope <http://layer1-service/orgs/openmbee> ;\n    mms:role mms-object:Role.AdminOrg ;\n."
+				},
+				"url": {
+					"raw": "{{host}}/policies/user02_openmbee_admin",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"policies",
+						"user02_openmbee_admin"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
