@@ -31,6 +31,14 @@ Run `docker-compose up` in this directory, once something like the following app
 
     layer1-service   | 2023-07-09T21:39:48,468Z [main] INFO  Application - Responding at http://0.0.0.0:8080
 
+### Setup GraphDB
+
+1. go to http://localhost:7200 to access the GraphDB UI
+2. Under Setup > Repositories > Create New Repository > GraphDB Repository, use `openmbee` as Repository ID, can use default settings, hit `Create`
+3. go to Import > Upload RDF Files > choose `mount/cluster.trig` file from this directory
+    1. click Import > Import (can leave everything blank)
+   
+### Using MMS 5 API
 The first step will be the retrieve an authentication token from the auth-service, with `password1`. 
 
 `curl -u user01 -X GET http://localhost:8082/login`
