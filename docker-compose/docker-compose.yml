@@ -19,14 +19,14 @@ services:
       - LDAP_PASSWORDS=password1,password2
 
   quad-store-server:
-    image: atomgraph/fuseki:4.6
+    image: ontotext/graphdb:10.3.0
     hostname: quad-server
     container_name: quad-server
-    command: --file=/tmp/mount/cluster.trig --update /ds
-    volumes:
-      - ${PWD}/mount:/tmp/mount
+    #command: --file=/tmp/mount/cluster.trig --update /ds
+    #volumes:
+    #  - ${PWD}/mount:/tmp/mount
     ports:
-      - 3030:3030
+      - 7200:7200
 
   minio-server:
     image: minio/minio:RELEASE.2022-05-26T05-48-41Z.hotfix.15f13935a
