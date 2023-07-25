@@ -22,6 +22,8 @@ services:
     image: atomgraph/fuseki:4.6
     hostname: quad-server
     container_name: quad-server
+    env_file:
+      - ${PWD}/env/mms5-quad-store.env
     command: --file=/tmp/mount/cluster.trig --update /ds
     volumes:
       - ${PWD}/mount:/tmp/mount
