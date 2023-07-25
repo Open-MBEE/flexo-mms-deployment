@@ -22,6 +22,9 @@ services:
     image: ontotext/graphdb:10.3.0
     hostname: quad-server
     container_name: quad-server
+    env_file:
+      - ${PWD}/env/mms5-quad-store-graphdb.env
+    command: -Dgraphdb.global.page.cache=true
     ports:
       - 7200:7200
 
