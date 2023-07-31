@@ -38,7 +38,9 @@ The default compose uses the Fuseki backend, a GraphDB example is also available
 GraphDB requires more setup than Fuseki, but also offers more functionality and a UI at `http://localhost:7200`.
 
 1. go to http://localhost:7200 to access the GraphDB UI
-2. Under Setup > Repositories > Create New Repository > GraphDB Repository, use `openmbee` as Repository ID, can use default settings, hit `Create`
+2. Under Setup > Repositories > Create New Repository > GraphDB Repository, use `openmbee` as Repository ID.
+    1. the recommended settings are to use "No inference" from the Ruleset dropdown and check all of: "Enable content index", "Enable predicate list index", and "Enable full-text search (FTS) index".
+    2. Leave all other settings as default and then hit `Create`
 3. go to Import > Upload RDF Files > choose `mount/cluster.trig` file from this directory
     1. click Import > Import (can leave everything blank)
    
