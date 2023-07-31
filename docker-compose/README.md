@@ -4,7 +4,7 @@
 This docker-compose will start all services required for all current MMS5 microservices. It utilizes the following open source services in the backend:
 
 - OpenLDAP - for Auth Service
-- Apache Fuseki - Quadstore
+- Apache Fuseki - Quadstore (GraphDB Option available)
 - MinIO - for Store Service
 
 With these initial services, the docker-compose will then start and connect the following MMS5 microservices:
@@ -31,6 +31,20 @@ Run `docker-compose up` in this directory, once something like the following app
 
     layer1-service   | 2023-07-09T21:39:48,468Z [main] INFO  Application - Responding at http://0.0.0.0:8080
 
+The default compose uses the Fuseki backend, a GraphDB example is also available, by doing `docker-compose -f docker-compose-graphdb.yml up` instead
+
+### Setup GraphDB (if using GraphDB)
+
+GraphDB requires more setup than Fuseki, but also offers more functionality and a UI at `http://localhost:7200`.
+
+1. go to http://localhost:7200 to access the GraphDB UI
+2. Under Setup > Repositories > Create New Repository > GraphDB Repository, use `openmbee` as Repository ID.
+    1. the recommended settings are to use "No inference" from the Ruleset dropdown and check all of: "Enable content index", "Enable predicate list index", and "Enable full-text search (FTS) index".
+    2. Leave all other settings as default and then hit `Create`
+3. go to Import > Upload RDF Files > choose `mount/cluster.trig` file from this directory
+    1. click Import > Import (can leave everything blank)
+   
+### Using MMS 5 API
 The first step will be the retrieve an authentication token from the auth-service, with `password1`. 
 
 `curl -u user01 -X GET http://localhost:8082/login`
@@ -56,9 +70,9 @@ print(response.json())
 
 You may see an error related to the `store-service` such that it doesn't start up (we believe this is due to issues with docker on m1/m2 mac). If this happens, the `store-service` is optional and can be taken out entirely. To remove it, remove the following lines and restart the compose:
 
-- `MMS5_LOAD_SERVICE_URL=http://store-service:8080/store` in env/mms5-layer1.env
+- `MMS5_LOAD_SERVICE_URL=http://store-service:8080/store` in env/mms5-layer1.env (env/mms5-layer1-graphdb.env if using GraphDB)
 
 - `store-service` under `depends_on:` in the docker-compose.yml file for layer1-service
 
 ## Shutdown
-`Ctrl-C` from the terminal and run `docker-compose down` once all containers are shut down.
+`Ctrl-C` from the terminal and run `docker-compose down` once all containers are shut down. (`docker-compose -f docker-compose-graphdb.yml down` for GraphDB)
