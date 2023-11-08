@@ -1,10 +1,10 @@
 apiVersion: v1
 data:
   JWT_AUDIENCE: jwt-audience
-  JWT_DOMAIN: https://mms5.openmbee.org/
-  JWT_REALM: MMS5 Microservices
+  JWT_DOMAIN: https://mms.openmbee.org/
+  JWT_REALM: Flexo MMS Microservices
   JWT_SECRET: thisissomethingsecret123
 kind: ConfigMap
 metadata:
   name: jwt-config
-  namespace: mms5
+  namespace: flexo-mms

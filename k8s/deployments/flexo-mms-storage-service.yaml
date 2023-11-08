@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mms5-storage-service
-  namespace: mms5
+  name: flexo-mms-storage-service
+  namespace: flexo-mms
 spec:
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-mms5-mms5-storage-service
+      workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-storage-service
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-mms5-mms5-storage-service
+        workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-storage-service
     spec:
       affinity: {}
       containers:
@@ -27,9 +27,9 @@ spec:
         - configMapRef:
             name: s3-config
             optional: false
-        image: openmbee/mms5-store-service:latest
+        image: openmbee/flexo-mms-store-service:latest
         imagePullPolicy: Always
-        name: mms5-storage-service
+        name: flexo-mms-storage-service
         resources: {}
         securityContext:
           allowPrivilegeEscalation: false

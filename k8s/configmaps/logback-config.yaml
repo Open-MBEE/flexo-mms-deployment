@@ -14,4 +14,4 @@ data:
 kind: ConfigMap
 metadata:
   name: logback-config
-  namespace: mms5
+  namespace: flexo-mms

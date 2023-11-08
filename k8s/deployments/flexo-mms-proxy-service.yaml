@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mms5-proxy-service
-  namespace: mms5
+  name: flexo-mms-proxy-service
+  namespace: flexo-mms
 spec:
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-mms5-mms5-proxy-service
+      workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-proxy-service
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,15 +15,15 @@ spec:
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-mms5-mms5-proxy-service
+        workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-proxy-service
     spec:
       containers:
       - envFrom:
           - configMapRef:
-              name: mms5-proxy-conf
+              name: flexo-mms-proxy-conf
         image: nginx:1.23-alpine
         imagePullPolicy: Always
-        name: mms5-proxy-service
+        name: flexo-mms-proxy-service
         resources: {}
         securityContext:
           allowPrivilegeEscalation: false
@@ -49,8 +49,8 @@ spec:
       - configMap:
           defaultMode: 256
           items:
-            - key: mms5.conf
+            - key: flexo-mms.conf
               path: default.conf
-          name: mms5-proxy-conf
+          name: flexo-mms-proxy-conf
           optional: false
         name: proxy-config-map

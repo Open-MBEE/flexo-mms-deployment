@@ -4,4 +4,4 @@ data:
 kind: ConfigMap
 metadata:
   name: os-config
-  namespace: mms5
+  namespace: flexo-mms

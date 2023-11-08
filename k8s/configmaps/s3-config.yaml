@@ -8,4 +8,4 @@ data:
 kind: ConfigMap
 metadata:
   name: s3-config
-  namespace: mms5
+  namespace: flexo-mms
