@@ -1,9 +1,9 @@
-[submodule "mms5-layer1-service"]
-	path = submodules/mms5-layer1-service
-	url = https://github.com/Open-MBEE/mms5-layer1-service.git
-[submodule "mms5-auth-service"]
-	path = submodules/mms5-auth-service
-	url = https://github.com/Open-MBEE/mms5-auth-service.git
-[submodule "mms5-store-service"]
-	path = submodules/mms5-store-service
-	url = https://github.com/Open-MBEE/mms5-store-service.git
+[submodule "submodules/flexo-mms-layer1-service"]
+	path = submodules/flexo-mms-layer1-service
+	url = https://github.com/Open-MBEE/flexo-mms-layer1-service.git
+[submodule "submodules/flexo-mms-store-service"]
+	path = submodules/flexo-mms-store-service
+	url = https://github.com/Open-MBEE/flexo-mms-store-service.git
+[submodule "submodules/flexo-mms-auth-service"]
+	path = submodules/flexo-mms-auth-service
+	url = https://github.com/Open-MBEE/flexo-mms-auth-service.git

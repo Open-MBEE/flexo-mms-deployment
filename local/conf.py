@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'MMS 5 Documentation'
+project = 'Flexo MMS Documentation'
 copyright = '2023, OpenMBEE'
 author = 'OpenMBEE'
 

@@ -1,4 +1,4 @@
-Welcome to Model Management System's documentation!
+Welcome to Flexo MMS's documentation!
 ===================================================
 
 .. include:: overview.rst
@@ -10,6 +10,6 @@ Welcome to Model Management System's documentation!
 
   overview
   local_quickstart
-  mms5-layer1-service/*
-  mms5-auth-service/*
-  mms5-store-service/*
+  flexo-mms-layer1-service/*
+  flexo-mms-auth-service/*
+  flexo-mms-store-service/*
