@@ -23,7 +23,7 @@ services:
     hostname: quad-server
     container_name: quad-server
     env_file:
-      - ${PWD}/env/mms5-quad-store-graphdb.env
+      - ./env/mms5-quad-store-graphdb.env
     command: -Dgraphdb.global.page.cache=true
     ports:
       - 7200:7200
@@ -44,8 +44,8 @@ services:
     hostname: auth-service
     container_name: auth-service
     env_file:
-      - ${PWD}/env/mms5-jwt.env
-      - ${PWD}/env/mms5-auth-graphdb.env
+      - ./env/mms5-jwt.env
+      - ./env/mms5-auth-graphdb.env
     depends_on:
       - openldap-server
       - quad-store-server
@@ -57,8 +57,8 @@ services:
     hostname: store-service
     container_name: store-service
     env_file:
-      - ${PWD}/env/mms5-jwt.env
-      - ${PWD}/env/mms5-store.env
+      - ./env/mms5-jwt.env
+      - ./env/mms5-store.env
     depends_on:
       - minio-server
     ports:
@@ -69,8 +69,8 @@ services:
     hostname: layer1-service
     container_name: layer1-service
     env_file:
-      - ${PWD}/env/mms5-jwt.env
-      - ${PWD}/env/mms5-layer1-graphdb.env
+      - ./env/mms5-jwt.env
+      - ./env/mms5-layer1-graphdb.env
     depends_on:
       - store-service
       - auth-service
