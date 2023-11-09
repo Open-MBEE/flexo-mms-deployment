@@ -42,7 +42,7 @@ services:
       - 9000:9000
 
   auth-service:
-    image: openmbee/flexo-mms-auth-service:develop-SNAPSHOT
+    image: openmbee/flexo-mms-auth-service:latest
     hostname: auth-service
     container_name: auth-service
     env_file:
@@ -55,7 +55,7 @@ services:
       - 8082:8080
 
   store-service:
-    image: openmbee/flexo-mms-store-service:develop-SNAPSHOT
+    image: openmbee/flexo-mms-store-service:latest
     hostname: store-service
     container_name: store-service
     env_file:
