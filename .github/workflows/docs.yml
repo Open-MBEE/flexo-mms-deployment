@@ -13,17 +13,14 @@ jobs:
       - run: |
           mkdir -p docs
           cp -r local/* docs/
-          mkdir -p docs/mms5-layer1-service
-          mkdir -p docs/mms5-auth-service
-          mkdir -p docs/mms5-store-service
+          mkdir -p docs/flexo-mms-layer1-service
+          mkdir -p docs/flexo-mms-auth-service
+          mkdir -p docs/flexo-mms-store-service
           chmod -R 755 submodules/
           rm .gitignore
-          cp -r submodules/mms5-layer1-service/docs/* docs/mms5-layer1-service/
-          cp -r submodules/mms5-auth-service/docs/* docs/mms5-auth-service/
-          cp -r submodules/mms5-store-service/docs/* docs/mms5-store-service/
-      #- uses: docker://pandoc/core:3
-      #  with:
-      #    args: "submodules/mms5-layer1-service/README.md -t rst -o docs/mms5-layer1-service/index.rst"
+          cp -r submodules/flexo-mms-layer1-service/docs/* docs/flexo-mms-layer1-service/
+          cp -r submodules/flexo-mms-auth-service/docs/* docs/flexo-mms-auth-service/
+          cp -r submodules/flexo-mms-store-service/docs/* docs/flexo-mms-store-service/
       - run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@noreply.github.com"

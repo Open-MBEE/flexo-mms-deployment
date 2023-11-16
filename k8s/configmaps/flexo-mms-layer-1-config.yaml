@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  FLEXO_MMS_GRAPH_STORE_PROTOCOL_URL: https://quadstore/sparql/gsp/
+  FLEXO_MMS_STORE_SERVICE_URL: http://flexo-mms-storage-service.flexo-mms.svc.cluster.local:8080/store
+  FLEXO_MMS_QUERY_URL: https://quadstore/sparql
+  FLEXO_MMS_ROOT_CONTEXT: https://mms.openmbee.org
+  FLEXO_MMS_SERVICE_ID: flexo-mms-layer1-0
+  FLEXO_MMS_UPDATE_URL: https://quadstore/sparql
+kind: ConfigMap
+metadata:
+  name: flexo-mms-layer-1-config
+  namespace: flexo-mms

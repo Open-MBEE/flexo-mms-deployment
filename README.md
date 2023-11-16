@@ -1,5 +1,5 @@
-# MMS 5 Deployment
+# Flexo MMS Deployment
 
-This repo contains sample files for MMS 5 deployment using docker compose or kubernetes.
+This repo contains sample files for Flexo MMS deployment using docker compose or kubernetes.
 
-Please see [here](https://mms5-deployment-guide.readthedocs.io/en/latest/index.html) for MMS 5 documentation.
+Please see [here](https://flexo-mms-deployment-guide.readthedocs.io/en/latest/index.html) for Flexo MMS documentation.

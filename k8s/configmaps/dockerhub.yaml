@@ -4,5 +4,5 @@ data:
 kind: Secret
 metadata:
   name: dockerhub
-  namespace: mms5
+  namespace: flexo-mms
 type: kubernetes.io/dockerconfigjson

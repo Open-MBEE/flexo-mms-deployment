@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mms5-auth-service
-  namespace: mms5
+  name: flexo-mms-layer1-service
+  namespace: flexo-mms
 spec:
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-mms5-mms5-auth-service
+      workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-layer1-service
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,8 +15,9 @@ spec:
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-mms5-mms5-auth-service
+        workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-layer1-service
     spec:
+      affinity: {}
       containers:
       - envFrom:
         - configMapRef:
@@ -24,12 +25,13 @@ spec:
             optional: false
         - configMapRef:
             name: os-config
-        - configMapRef:
-            name: ldap-config
             optional: false
-        image: openmbee/mms5-auth-service:latest
+        - configMapRef:
+            name: flexo-mms-layer-1-config
+            optional: false
+        image: openmbee/flexo-mms-layer1-service:latest
         imagePullPolicy: Always
-        name: mms5-auth-service
+        name: flexo-mms-layer1-service
         resources: {}
         securityContext:
           allowPrivilegeEscalation: false

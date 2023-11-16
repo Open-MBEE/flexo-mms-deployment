@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mms5-proxy-service
-  namespace: mms5
+  name: flexo-mms-auth-service
+  namespace: flexo-mms
 spec:
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-mms5-mms5-proxy-service
+      workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-auth-service
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,15 +15,21 @@ spec:
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-mms5-mms5-proxy-service
+        workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-auth-service
     spec:
       containers:
       - envFrom:
-          - configMapRef:
-              name: mms5-proxy-conf
-        image: nginx:1.23-alpine
+        - configMapRef:
+            name: jwt-config
+            optional: false
+        - configMapRef:
+            name: os-config
+        - configMapRef:
+            name: ldap-config
+            optional: false
+        image: openmbee/flexo-mms-auth-service:latest
         imagePullPolicy: Always
-        name: mms5-proxy-service
+        name: flexo-mms-auth-service
         resources: {}
         securityContext:
           allowPrivilegeEscalation: false
@@ -36,8 +42,8 @@ spec:
         terminationMessagePolicy: File
         tty: true
         volumeMounts:
-          - mountPath: /etc/nginx/conf.d/
-            name: proxy-config-map
+        - mountPath: /mnt/config/logback/
+          name: logback-config-map
       dnsPolicy: ClusterFirst
       imagePullSecrets:
       - name: dockerhub
@@ -49,8 +55,8 @@ spec:
       - configMap:
           defaultMode: 256
           items:
-            - key: mms5.conf
-              path: default.conf
-          name: mms5-proxy-conf
+          - key: logback.xml
+            path: loggers-include.xml
+          name: logback-config
           optional: false
-        name: proxy-config-map
+        name: logback-config-map
