@@ -29,12 +29,12 @@ services:
       - 7200:7200
 
   minio-server:
-    image: minio/minio:RELEASE.2022-05-26T05-48-41Z.hotfix.15f13935a
+    image: quay.io/minio/minio
     hostname: minio-server
     container_name: minio-server
     environment:
-      - MINIO_ACCESS_KEY=admintest
-      - MINIO_SECRET_KEY=admintest
+      - MINIO_ROOT_USER=admintest
+      - MINIO_ROOT_PASSWORD=admintest
     command: server /tmp/data
     ports:
       - 9000:9000
@@ -53,7 +53,7 @@ services:
       - 8082:8080
 
   store-service:
-    image: openmbee/flexo-mms-store-service:latest
+    image: openmbee/flexo-mms-store-service:develop-SNAPSHOT
     hostname: store-service
     container_name: store-service
     env_file:
