@@ -66,13 +66,5 @@ response = requests.get("http://auth-service:8080/login", auth=HTTPBasicAuth('us
 print(response.json())
 ```
 
-## Potential Errors
-
-You may see an error related to the `store-service` such that it doesn't start up (we believe this is due to issues with docker on m1/m2 mac). If this happens, the `store-service` is optional and can be taken out entirely. To remove it, remove the following lines and restart the compose:
-
-- `FLEXO_MMS_STORE_SERVICE_URL=http://store-service:8080/store` in env/flexo-mms-layer1.env (env/flexo-mms-layer1-graphdb.env if using GraphDB)
-
-- `store-service` under `depends_on:` in the docker-compose.yml file for layer1-service
-
 ## Shutdown
 `Ctrl-C` from the terminal and run `docker-compose down` once all containers are shut down. (`docker-compose -f docker-compose-graphdb.yml down` for GraphDB)
