@@ -3,20 +3,17 @@ version: '3.8'
 services:
 
   openldap-server:
-    image: bitnami/openldap:2.6.4
+    image: osixia/openldap:1.5.0
     hostname: openldap-server
     container_name: openldap-server
+    volumes:
+      - ./mount:/tmp/mount
     ports:
       - 1389:1389
     environment:
-      - LDAP_PORT_NUMBER=1389
-      - LDAP_ROOT=dc=example,dc=org
-      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_PORT=1389
       - LDAP_ADMIN_PASSWORD=adminpassword
-      - LDAP_USERS=user01,user02
-      - LDAP_USER_DC=users
-      - LDAP_GROUP=group01
-      - LDAP_PASSWORDS=password1,password2
+      - LDAP_SEED_INTERNAL_LDIF_PATH=/tmp/mount
 
   quad-store-server:
     image: atomgraph/fuseki:4.6
