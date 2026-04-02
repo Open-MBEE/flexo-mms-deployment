@@ -1,0 +1,16 @@
+meta {
+  name: get model from branch
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{host}}/orgs/openmbee/repos/hackathon/branches/master/graph
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

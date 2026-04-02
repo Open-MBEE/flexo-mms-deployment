@@ -1,0 +1,16 @@
+meta {
+  name: Flexo MMS Local Example
+}
+
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+vars:pre-request {
+  host: http://localhost:8080
+  token: 
+}

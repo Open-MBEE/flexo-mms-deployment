@@ -1,0 +1,25 @@
+meta {
+  name: create lock
+  type: http
+  seq: 15
+}
+
+put {
+  url: {{host}}/orgs/openmbee/repos/hackathon/locks/newlock
+  body: text
+  auth: inherit
+}
+
+headers {
+  content-type: text/turtle
+}
+
+body:text {
+  <> dct:title "new lock"@en .
+  <> mms:ref <../branches/master> .
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

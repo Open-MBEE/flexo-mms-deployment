@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Flexo MMS Local Example",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

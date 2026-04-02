@@ -1,0 +1,24 @@
+meta {
+  name: create repo
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/orgs/openmbee/repos/hackathon
+  body: text
+  auth: inherit
+}
+
+headers {
+  Content-Type: text/turtle
+}
+
+body:text {
+  <> dct:title "hackathon"@en .
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,29 @@
+meta {
+  name: query repo
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{host}}/orgs/openmbee/repos/hackathon/query
+  body: text
+  auth: inherit
+}
+
+headers {
+  content-type: application/sparql-query
+}
+
+body:text {
+  prefix mms: <https://mms.openmbee.org/rdf/ontology/>
+  
+  select ?ref ?commit ?time where {
+  	?ref mms:commit ?commit .
+  	?commit mms:submitted  ?time
+  } 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

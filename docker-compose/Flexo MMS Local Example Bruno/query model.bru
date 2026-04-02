@@ -1,0 +1,37 @@
+meta {
+  name: query model
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{host}}/orgs/openmbee/repos/hackathon/branches/master/query
+  body: text
+  auth: inherit
+}
+
+headers {
+  content-type: application/sparql-query
+}
+
+body:text {
+  prefix gnisf: <http://gnis-ld.org/lod/gnis/feature/>
+  prefix gnisfa: <http://gnis-ld.org/lod/gnis/feature-alias/>
+  prefix gniso: <http://gnis-ld.org/lod/gnis/ontology/>
+  prefix gnisg: <http://gnis-ld.org/geometry/point/>
+  prefix owl: <http://www.w3.org/2002/07/owl#>
+  prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  prefix geosparql: <http://www.opengis.net/ont/geosparql#>
+  prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+  
+  select * {
+    ?s ?p ?o
+  } limit 10
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,30 @@
+meta {
+  name: add user02 as org admin policy
+  type: http
+  seq: 14
+}
+
+put {
+  url: {{host}}/policies/user02_openmbee_admin
+  body: text
+  auth: inherit
+}
+
+headers {
+  content-type: text/turtle
+}
+
+body:text {
+  prefix mms-object: <https://mms.openmbee.org/rdf/objects/>
+  
+  
+  <> mms:subject <http://layer1-service/users/ldap/user/user02> ;
+      mms:scope <http://layer1-service/orgs/openmbee> ;
+      mms:role mms-object:Role.AdminOrg ;
+  .
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

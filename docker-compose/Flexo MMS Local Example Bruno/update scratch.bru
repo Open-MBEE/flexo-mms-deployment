@@ -1,0 +1,40 @@
+meta {
+  name: update scratch
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{host}}/orgs/openmbee/repos/hackathon/scratches/unversioned/update
+  body: text
+  auth: inherit
+}
+
+headers {
+  content-type: application/sparql-update
+}
+
+body:text {
+  prefix gnisf: <http://gnis-ld.org/lod/gnis/feature/>
+  prefix gnisfa: <http://gnis-ld.org/lod/gnis/feature-alias/>
+  prefix gniso: <http://gnis-ld.org/lod/gnis/ontology/>
+  prefix gnisg: <http://gnis-ld.org/geometry/point/>
+  prefix owl: <http://www.w3.org/2002/07/owl#>
+  prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  prefix geosparql: <http://www.opengis.net/ont/geosparql#>
+  prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+  
+  prefix : <https://mms.openmbee.org/demos/hackathon/>
+  prefix foaf: <http://xmlns.com/foaf/0.1/>
+  prefix geonames: <http://www.geonames.org/ontology#>
+  
+  insert data {
+    :INCOSE_IS_2023 geonames:locatedIn gnisfa:Hawaii .
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

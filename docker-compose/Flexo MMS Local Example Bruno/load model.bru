@@ -1,0 +1,24 @@
+meta {
+  name: load model
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{host}}/orgs/openmbee/repos/hackathon/branches/master/graph
+  body: file
+  auth: inherit
+}
+
+headers {
+  content-type: text/turtle
+}
+
+body:file {
+  file: @file(gnis-hawaii.ttl) @contentType(text/turtle; charset=utf-8)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

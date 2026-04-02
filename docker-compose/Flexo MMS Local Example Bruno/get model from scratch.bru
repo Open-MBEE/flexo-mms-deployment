@@ -1,0 +1,16 @@
+meta {
+  name: get model from scratch
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{host}}/orgs/openmbee/repos/hackathon/scratches/unversioned/graph
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

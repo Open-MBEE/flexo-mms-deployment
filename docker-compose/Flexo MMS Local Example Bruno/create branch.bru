@@ -1,0 +1,25 @@
+meta {
+  name: create branch
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{host}}/orgs/openmbee/repos/hackathon/branches/newbranch
+  body: text
+  auth: inherit
+}
+
+headers {
+  content-type: text/turtle
+}
+
+body:text {
+  <> dct:title "new branch"@en .
+  <> mms:ref <./master> .
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

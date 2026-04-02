@@ -1,0 +1,16 @@
+meta {
+  name: get model from lock
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{host}}/orgs/openmbee/repos/hackathon/locks/newlock/graph
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
