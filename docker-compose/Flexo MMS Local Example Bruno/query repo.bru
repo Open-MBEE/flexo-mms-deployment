@@ -1,11 +1,11 @@
 meta {
   name: query repo
   type: http
-  seq: 10
+  seq: 13
 }
 
 post {
-  url: {{host}}/orgs/openmbee/repos/hackathon/query
+  url: {{host}}/orgs/openmbee/repos/test/query
   body: text
   auth: inherit
 }
@@ -17,9 +17,10 @@ headers {
 body:text {
   prefix mms: <https://mms.openmbee.org/rdf/ontology/>
   
-  select ?ref ?commit ?time where {
+  select ?ref ?commit ?time ?parent where {
   	?ref mms:commit ?commit .
-  	?commit mms:submitted  ?time
+  	?commit mms:submitted  ?time ;
+            mms:parent ?parent .
   } 
 }
 

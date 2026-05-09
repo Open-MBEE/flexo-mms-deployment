@@ -1,0 +1,16 @@
+meta {
+  name: get model from newbranch
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{host}}/orgs/openmbee/repos/test/branches/newbranch/graph
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

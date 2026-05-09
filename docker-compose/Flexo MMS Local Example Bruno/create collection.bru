@@ -1,0 +1,26 @@
+meta {
+  name: create collection
+  type: http
+  seq: 21
+}
+
+put {
+  url: {{host}}/orgs/openmbee/collections/combined
+  body: text
+  auth: inherit
+}
+
+headers {
+  Content-Type: text/turtle
+}
+
+body:text {
+  <> dct:title "combined"@en ;
+    mms:collects <../repos/test/branches/master>, <../repos/test/locks/newlock>, <../repos/test/scratches/unversioned>, <../repos/test/branches/newbranch> .
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

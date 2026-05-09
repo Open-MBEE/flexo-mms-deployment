@@ -20,7 +20,6 @@ graph m-graph:AccessControl.Agents {
 
 	m-user:anon a mms:User ;
 		mms:id "anon" .
-
     <http://layer1-service/users/ldap/user/user01> a mms:User ;
     	mms:id "ldap/user/user01" .
 
@@ -38,8 +37,8 @@ graph m-graph:AccessControl.Agents {
 # default policies
 graph m-graph:AccessControl.Policies {
 	m-policy:DefaultSuperAdmins a mms:Policy ;
-		mms:subject m-user:root, m-group:SuperAdmins, <http://layer1-service/users/ldap/user/user01>, <http://layer1-service/groups/ldap/group/group01> ;
-		mms:scope <http://layer1-service/> ;
+        mms:subject m-user:root, m-group:SuperAdmins, <http://layer1-service/users/ldap/user/user01>, <http://layer1-service/groups/ldap/group/group01> ;
+        mms:scope <http://layer1-service/> ;
 		mms:role mms-object:Role.AdminCluster, mms-object:Role.AdminOrg, mms-object:Role.AdminRepo, mms-object:Role.AdminMetadata, mms-object:Role.AdminModel, mms-object:Role.AdminAccessControlAny .
 }
 
@@ -199,7 +198,8 @@ graph m-graph:AccessControl.Definitions {
 	# ====================================
 	mms-object:Permission.CreateCluster a mms:Permission .
 
-	mms-object:Permission.ReadCluster a mms:Permission .
+	mms-object:Permission.ReadCluster a mms:Permission ;
+		mms:implies mms-object:Permission.ReadOrg, mms-object:Permission.ReadAccessControlAny .
 
 	mms-object:Permission.UpdateCluster a mms:Permission ;
 		mms:implies mms-object:Permission.ReadCluster, mms-object:Permission.CreateOrg, mms-object:Permission.CreateAccessControlAny .
@@ -209,7 +209,8 @@ graph m-graph:AccessControl.Definitions {
 
 	mms-object:Permission.CreateOrg a mms:Permission .
 
-	mms-object:Permission.ReadOrg a mms:Permission .
+	mms-object:Permission.ReadOrg a mms:Permission ;
+		mms:implies mms-object:Permission.ReadProject .
 
 	mms-object:Permission.UpdateOrg a mms:Permission ;
 		mms:implies mms-object:Permission.ReadOrg, mms-object:Permission.CreateProject .
@@ -241,7 +242,8 @@ graph m-graph:AccessControl.Definitions {
 
 	mms-object:Permission.CreateRepo a mms:Permission .
 
-	mms-object:Permission.ReadRepo a mms:Permission .
+	mms-object:Permission.ReadRepo a mms:Permission ;
+		mms:implies mms-object:Permission.ReadRef, mms-object:Permission.ReadArtifact, mms-object:Permission.ReadCommit, mms-object:Permission.ReadScratch .
 
 	mms-object:Permission.UpdateRepo a mms:Permission ;
 		mms:implies mms-object:Permission.ReadRepo, mms-object:Permission.ReadCommit, mms-object:Permission.ReadScratch, mms-object:Permission.UpdateBranch, mms-object:Permission.UpdateLock, mms-object:Permission.UpdateCommit, mms-object:Permission.UpdateRef, mms-object:Permission.UpdateArtifact, mms-object:Permission.UpdateScratch .
@@ -251,7 +253,8 @@ graph m-graph:AccessControl.Definitions {
 
 	mms-object:Permission.CreateRef a mms:Permission .
 
-	mms-object:Permission.ReadRef a mms:Permission .
+	mms-object:Permission.ReadRef a mms:Permission ;
+		mms:implies mms-object:Permission.ReadBranch, mms-object:Permission.ReadLock .
 
 	mms-object:Permission.UpdateRef a mms:Permission ;
 		mms:implies mms-object:Permission.ReadRef, mms-object:Permission.UpdateBranch, mms-object:Permission.UpdateLock .
@@ -311,7 +314,8 @@ graph m-graph:AccessControl.Definitions {
 
 	mms-object:Permission.CreateAccessControlAny a mms:Permission .
 
-	mms-object:Permission.ReadAccessControlAny a mms:Permission .
+	mms-object:Permission.ReadAccessControlAny a mms:Permission ;
+		mms:implies mms-object:Permission.ReadAgent, mms-object:Permission.ReadPolicy .
 
 	mms-object:Permission.UpdateAccessControlAny a mms:Permission ;
 		mms:implies mms-object:Permission.ReadAccessControlAny, mms-object:Permission.CreateAgent, mms-object:Permission.CreatePolicy .
@@ -321,7 +325,8 @@ graph m-graph:AccessControl.Definitions {
 
 	mms-object:Permission.CreateAgent a mms:Permission .
 
-	mms-object:Permission.ReadAgent a mms:Permission .
+	mms-object:Permission.ReadAgent a mms:Permission ;
+		mms:implies mms-object:Permission.ReadUser, mms-object:Permission.ReadGroup .
 
 	mms-object:Permission.UpdateAgent a mms:Permission ;
 		mms:implies mms-object:Permission.ReadAgent, mms-object:Permission.CreateUser, mms-object:Permission.CreateGroup .
@@ -379,6 +384,60 @@ graph m-graph:AccessControl.Definitions {
 
 	mms-object:Role.ReadRepo a mms:Role ;
 		mms:permits mms-object:Permission.ReadRepo .
+
+	mms-object:Role.AdminCollection a mms:Role ;
+		mms:permits mms-object:Permission.DeleteCollection .
+
+	mms-object:Role.WriteCollection a mms:Role ;
+		mms:permits mms-object:Permission.UpdateCollection .
+
+	mms-object:Role.ReadCollection a mms:Role ;
+		mms:permits mms-object:Permission.ReadCollection .
+
+	mms-object:Role.AdminBranch a mms:Role ;
+		mms:permits mms-object:Permission.DeleteBranch .
+
+	mms-object:Role.WriteBranch a mms:Role ;
+		mms:permits mms-object:Permission.UpdateBranch .
+
+	mms-object:Role.ReadBranch a mms:Role ;
+		mms:permits mms-object:Permission.ReadBranch .
+
+	mms-object:Role.AdminLock a mms:Role ;
+		mms:permits mms-object:Permission.DeleteLock .
+
+	mms-object:Role.WriteLock a mms:Role ;
+		mms:permits mms-object:Permission.UpdateLock .
+
+	mms-object:Role.ReadLock a mms:Role ;
+		mms:permits mms-object:Permission.ReadLock .
+
+	mms-object:Role.AdminArtifact a mms:Role ;
+		mms:permits mms-object:Permission.DeleteArtifact .
+
+	mms-object:Role.WriteArtifact a mms:Role ;
+		mms:permits mms-object:Permission.UpdateArtifact .
+
+	mms-object:Role.ReadArtifact a mms:Role ;
+		mms:permits mms-object:Permission.ReadArtifact .
+
+	mms-object:Role.AdminScratch a mms:Role ;
+		mms:permits mms-object:Permission.DeleteScratch .
+
+	mms-object:Role.WriteScratch a mms:Role ;
+		mms:permits mms-object:Permission.UpdateScratch .
+
+	mms-object:Role.ReadScratch a mms:Role ;
+		mms:permits mms-object:Permission.ReadScratch .
+
+	mms-object:Role.AdminCommit a mms:Role ;
+		mms:permits mms-object:Permission.DeleteCommit .
+
+	mms-object:Role.WriteCommit a mms:Role ;
+		mms:permits mms-object:Permission.UpdateCommit .
+
+	mms-object:Role.ReadCommit a mms:Role ;
+		mms:permits mms-object:Permission.ReadCommit .
 
 	mms-object:Role.AdminModel a mms:Role ;
 		mms:permits mms-object:Permission.DeleteModel .

@@ -1,0 +1,24 @@
+meta {
+  name: query newbranch
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{host}}/orgs/openmbee/repos/test/branches/newbranch/query
+  body: sparql
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/sparql-query
+}
+
+body:sparql {
+  select * where {?s ?p ?o .}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,30 @@
+meta {
+  name: user2 no permissions to create collection
+  type: http
+  seq: 27
+}
+
+put {
+  url: {{host}}/orgs/openmbee/collections/noperms
+  body: text
+  auth: bearer
+}
+
+headers {
+  Content-Type: text/turtle
+}
+
+auth:bearer {
+  token: {{token2}}
+}
+
+body:text {
+  <> dct:title "combined"@en ;
+    mms:collects <../repos/test/branches/master>, <../repos/test/locks/newlock>, <../repos/test/scratches/unversioned>, <../repos/test/branches/newbranch> .
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

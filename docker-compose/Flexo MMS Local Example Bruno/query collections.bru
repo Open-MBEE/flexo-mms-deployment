@@ -1,0 +1,24 @@
+meta {
+  name: query collections
+  type: http
+  seq: 23
+}
+
+post {
+  url: {{host}}/orgs/openmbee/collections/combined/query
+  body: sparql
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/sparql-query
+}
+
+body:sparql {
+  select * where {?s ?p ?o .}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,24 @@
+meta {
+  name: user2 no permissions to read
+  type: http
+  seq: 28
+}
+
+get {
+  url: {{host}}/orgs/openmbee/repos/test/branches/master/graph
+  body: none
+  auth: bearer
+}
+
+headers {
+  Content-Type: text/turtle
+}
+
+auth:bearer {
+  token: {{token2}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

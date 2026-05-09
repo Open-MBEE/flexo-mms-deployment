@@ -1,0 +1,25 @@
+meta {
+  name: user2 login
+  type: http
+  seq: 25
+}
+
+get {
+  url: http://localhost:8082/login
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: user02
+  password: password2
+}
+
+vars:post-response {
+  token2: res('token')
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

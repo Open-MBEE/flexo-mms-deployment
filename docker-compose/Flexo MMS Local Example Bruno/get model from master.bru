@@ -1,11 +1,11 @@
 meta {
-  name: get model from lock
+  name: get model from master
   type: http
-  seq: 17
+  seq: 18
 }
 
 get {
-  url: {{host}}/orgs/openmbee/repos/test/locks/newlock/graph
+  url: {{host}}/orgs/openmbee/repos/test/branches/master/graph
   body: none
   auth: inherit
 }

@@ -1,7 +1,7 @@
 meta {
-  name: load model
+  name: load master model again
   type: http
-  seq: 5
+  seq: 10
 }
 
 put {
@@ -18,16 +18,12 @@ body:text {
   @prefix : <https://mms.openmbee.org/demos/people/> .
   @prefix foaf: <http://xmlns.com/foaf/0.1/> .
   
-  :Alice a :Person ;
-        foaf:name "Alice" .
-  :Rex a :Dog ;
-        :owner :Alice ;
-        :likes :PeanutButter ;
-        foaf:name "Rex" .
-}
-
-body:file {
-  file: @file()
+  :Cathy a :Person ;
+        foaf:name "Cathy" .
+  :Bun a :Bunny ;
+        :owner :Cathy ;
+        :likes :Lettuce ;
+        foaf:name "Bun" .
 }
 
 settings {

@@ -1,11 +1,11 @@
 meta {
-  name: add user02 as org admin policy
+  name: add user02 read collection permission
   type: http
-  seq: 14
+  seq: 24
 }
 
 put {
-  url: {{host}}/policies/user02_openmbee_admin
+  url: {{host}}/policies/user02_read_collection
   body: text
   auth: inherit
 }
@@ -19,8 +19,8 @@ body:text {
   
   
   <> mms:subject <http://layer1-service/users/ldap/user/user02> ;
-      mms:scope <http://layer1-service/orgs/openmbee> ;
-      mms:role mms-object:Role.AdminOrg ;
+      mms:scope <http://layer1-service/orgs/openmbee/collections/combined> ;
+      mms:role mms-object:Role.ReadCollection ;
   .
 }
 
