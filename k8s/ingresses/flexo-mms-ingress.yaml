@@ -23,6 +23,13 @@ spec:
         pathType: ImplementationSpecific
       - backend:
           service:
+            name: flexo-mms-sso-auth-service
+            port:
+              number: 8080
+        path: /sso
+        pathType: ImplementationSpecific
+      - backend:
+          service:
             name: flexo-mms-auth-service
             port:
               number: 8080
