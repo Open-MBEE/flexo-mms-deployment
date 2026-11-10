@@ -1,7 +1,9 @@
 {{- $username := include "flexo-mms.tests.username" . }}
 {{- $password := include "flexo-mms.tests.password" . }}
-{{- if and .Values.tests.enabled .Values.auth.enabled .Values.layer1.enabled $username $password }}
+{{- if and .Values.tests.enabled .Values.auth.enabled .Values.layer1.enabled (or .Values.tests.existingSecret (and $username $password)) }}
 {{- $meta := dict "root" . "component" "test" "version" (toString .Values.tests.image.tag) }}
+{{- $credentials := default (printf "%s-credentials" (include "flexo-mms.componentName" $meta)) .Values.tests.existingSecret }}
+{{- if not .Values.tests.existingSecret }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -17,6 +19,7 @@ type: kubernetes.io/basic-auth
 stringData:
   username: {{ $username | quote }}
   password: {{ $password | quote }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Pod
@@ -68,7 +71,7 @@ spec:
   volumes:
     - name: credentials
       secret:
-        secretName: {{ include "flexo-mms.componentName" $meta }}-credentials
+        secretName: {{ $credentials }}
     - name: tmp
       emptyDir: {}
 {{- end }}

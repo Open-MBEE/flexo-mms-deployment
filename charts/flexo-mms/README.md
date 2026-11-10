@@ -474,6 +474,7 @@ Kubernetes: `>=1.25.0-0`
 | store.tolerations | list | `[]` |  |
 | store.topologySpreadConstraints | list | `[]` |  |
 | tests.enabled | bool | `true` | Render the `helm test` Pod, which logs in through the auth service and lists orgs on layer1. |
+| tests.existingSecret | string | `""` | Existing Secret with `username` and `password` keys to use instead of the inline values; nothing is stored by the chart then. |
 | tests.image.pullPolicy | string | `"IfNotPresent"` |  |
 | tests.image.repository | string | `"curlimages/curl"` |  |
 | tests.image.tag | string | `"8.14.1"` |  |

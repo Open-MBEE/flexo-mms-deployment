@@ -725,6 +725,8 @@ tests:
   username: ""
   # -- Password for the test login.
   password: ""
+  # -- Existing Secret with `username` and `password` keys to use instead of the inline values; nothing is stored by the chart then.
+  existingSecret: ""
   resources:
     requests:
       cpu: 10m

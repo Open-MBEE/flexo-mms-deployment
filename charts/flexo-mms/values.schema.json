@@ -1518,6 +1518,9 @@
         },
         "resources": {
           "type": "object"
+        },
+        "existingSecret": {
+          "type": "string"
         }
       },
       "additionalProperties": false
