@@ -21,7 +21,7 @@ data:
   FLEXO_MMS_MASTER_QUERY_URL: {{ . | quote }}
   {{- end }}
   {{- with (include "flexo-mms.layer1.storeServiceUrl" .) }}
-  FLEXO_MMS_STORE_SERVICE_URL: {{ . | quote }}
+  FLEXO_MMS_STORE_SERVICE_URL: {{ . | quote }} # NOSONAR pod-to-pod URL inside the cluster
   {{- end }}
   FLEXO_MMS_ARTIFACT_USE_STORE: {{ .Values.layer1.config.artifactUseStore | quote }}
   FLEXO_MMS_GLOMAR_RESPONSE: {{ .Values.layer1.config.glomarResponse | quote }}
