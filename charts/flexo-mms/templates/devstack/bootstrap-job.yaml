@@ -11,7 +11,7 @@ metadata:
   annotations:
     helm.sh/hook: {{ $c.hooks | quote }}
     helm.sh/hook-weight: "0"
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-delete-policy: before-hook-creation
     {{- with (include "flexo-mms.annotations" .) }}
     {{- . | nindent 4 }}
     {{- end }}
@@ -42,8 +42,6 @@ spec:
           securityContext:
             {{- include "flexo-mms.containerSecurityContext" (dict "root" . "values" $c) | nindent 12 }}
           env:
-            - name: FUSEKI_URL
-              value: {{ include "flexo-mms.fusekiUrl" . | quote }}
             - name: DATASET_URL
               value: {{ include "flexo-mms.fusekiDatasetUrl" . | quote }}
             - name: TIMEOUT_SECONDS
@@ -53,8 +51,8 @@ spec:
             - -ec
             - |
               waited=0
-              until curl -sf "$FUSEKI_URL/\$/ping" >/dev/null; do
-                if [ "$waited" -ge "$TIMEOUT_SECONDS" ]; then echo "timed out waiting for $FUSEKI_URL"; exit 1; fi
+              until curl -sf "$DATASET_URL/sparql?query=ASK%7B%7D" >/dev/null; do
+                if [ "$waited" -ge "$TIMEOUT_SECONDS" ]; then echo "timed out waiting for $DATASET_URL"; exit 1; fi
                 sleep 2; waited=$((waited+2))
               done
               echo "loading cluster.trig into $DATASET_URL"

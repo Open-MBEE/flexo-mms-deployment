@@ -9,10 +9,10 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
   annotations:
-    helm.sh/hook: test
-    helm.sh/hook-weight: "-5"
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    {{- . | nindent 4 }}
+  {{- end }}
 type: kubernetes.io/basic-auth
 stringData:
   username: {{ $username | quote }}
