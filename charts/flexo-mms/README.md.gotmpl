@@ -1,0 +1,87 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+## Quick start
+
+Self-contained development stack (Fuseki, MinIO, OpenLDAP with users `user01`/`password1`, `user02`/`password2`) in the current namespace:
+
+```bash
+helm install flexo charts/flexo-mms --set devStack.enabled=true
+helm test flexo
+```
+
+Production-style install against your own backends:
+
+```yaml
+# my-values.yaml
+jwt:
+  existingSecret: flexo-jwt          # key JWT_SECRET
+quadStore:
+  queryUrl: https://quadstore.example.org/repositories/flexo
+  updateUrl: https://quadstore.example.org/repositories/flexo/statements
+  graphStoreProtocolUrl: https://quadstore.example.org/repositories/flexo/rdf-graphs/service
+s3:
+  region: us-west-2
+  bucket: flexo-artifacts
+  existingSecret: flexo-s3           # keys AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (omit to use IRSA)
+ldap:
+  location: ldaps://ldap.example.org:636
+  base: dc=example,dc=org
+ingress:
+  enabled: true
+  className: nginx
+  hosts: [flexo.example.org]
+  tls:
+    - secretName: flexo-tls
+      hosts: [flexo.example.org]
+```
+
+```bash
+helm install flexo charts/flexo-mms -f my-values.yaml
+```
+
+Load a bootstrap policy graph (see `files/cluster.trig`, with `http://layer1-service/` replaced by your `layer1.rootContext`) into the quad store, or no user will be authorized.
+
+## Components
+
+| Value prefix | Image | Default | Ingress path |
+|---|---|---|---|
+| `layer1` | `openmbee/flexo-mms-layer1-service` | enabled | `/` |
+| `auth` | `openmbee/flexo-mms-auth-service` (LDAP basic-auth → JWT) | enabled | `/login` |
+| `sso` | `openmbee/flexo-mms-sso-auth-service` (OIDC → JWT) | disabled | `sso.contextPath` (`/sso`) |
+| `store` | `openmbee/flexo-mms-store-service` (S3 artifacts) | enabled | — (internal) |
+| `devStack.fuseki` / `devStack.minio` / `devStack.openldap` | `atomgraph/fuseki`, `bitnamilegacy/minio`, `bitnamilegacy/openldap` | disabled | — |
+
+Every component accepts `enabled`, `image.*`, `replicaCount`, `resources`, `podAnnotations`, `podLabels`, `nodeSelector`, `tolerations`, `affinity`, `extraEnv`, `extraEnvFrom`, `extraVolumes`, `extraVolumeMounts`, `service.{type,port}`, `startupProbe`/`livenessProbe`/`readinessProbe`, `podDisruptionBudget` and `autoscaling`, plus per-component `podSecurityContext`/`containerSecurityContext` overrides that are merged over the chart-wide defaults.
+
+## Secrets
+
+Sensitive values never land in a ConfigMap. Each has an inline value for development and an `existingSecret` (+ key) override for real deployments:
+
+| Secret | Inline value | Existing secret |
+|---|---|---|
+| JWT signing secret | `jwt.secret` | `jwt.existingSecret` / `jwt.existingSecretKey` |
+| S3 credentials | `s3.accessKeyId`, `s3.secretAccessKey` | `s3.existingSecret` / `s3.existingSecretAccessKeyIdKey`, `s3.existingSecretSecretAccessKeyKey` |
+| OIDC client secret | `sso.oidc.clientSecret` | `sso.oidc.existingSecret` / `sso.oidc.existingSecretKey` |
+| SSO datasource password | `sso.datasource.password` | `sso.datasource.existingSecret` / `sso.datasource.existingSecretKey` |
+| Docker Hub pull secret | `imagePullSecret.{username,password}` | `global.imagePullSecrets` |
+
+When `jwt.secret` is empty and the dev stack is off, the chart generates a random secret on first install and keeps it across upgrades (`lookup`).
+
+## Security defaults
+
+Pods run as uid/gid 10001 with `runAsNonRoot`, `allowPrivilegeEscalation: false`, all capabilities dropped, `seccompProfile: RuntimeDefault`, `readOnlyRootFilesystem: true` (with an `emptyDir` on `/tmp`) and no automounted service-account token. Known exceptions, set in `values.yaml`:
+
+- `devStack.openldap`: the Bitnami image initialises `/opt/bitnami/openldap` at start-up and runs as uid 1001, so it keeps a writable root filesystem.
+- `devStack.fuseki`: the image runs as its own `fuseki` user and writes to `/fuseki/databases` and `/fuseki/logs`, which are mounted volumes.
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
