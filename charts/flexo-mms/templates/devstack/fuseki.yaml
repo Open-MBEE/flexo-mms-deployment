@@ -4,7 +4,7 @@
 {{- $env := printf "- name: JAVA_OPTIONS\n  value: %s" ($c.javaOptions | quote) }}
 {{- $args := list "--update" "--tdb2" (printf "--loc=/fuseki/databases/%s" $c.dataset) (printf "/%s" $c.dataset) }}
 {{- $volumes := printf "%s\n- name: logs\n  emptyDir: {}" (include "flexo-mms.devStack.dataVolume" $ctx) }}
-{{- $mounts := "- name: data\n  mountPath: /fuseki/databases\n- name: logs\n  mountPath: /fuseki/logs" }}
+{{- $mounts := printf "- name: data\n  mountPath: /fuseki/databases/%s\n- name: logs\n  mountPath: /fuseki/logs" $c.dataset }}
 {{- $values := merge (dict "args" $args) $c }}
 {{- include "flexo-mms.deployment" (dict
   "root" .
