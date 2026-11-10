@@ -148,7 +148,7 @@ Kubernetes: `>=1.25.0-0`
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true}` | Container-level security context applied to every container (merged under each component's `containerSecurityContext`). |
 | devStack.bootstrap.affinity | object | `{}` |  |
 | devStack.bootstrap.backoffLimit | int | `3` | Job backoff limit. |
-| devStack.bootstrap.enabled | bool | `true` | Run a Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki. |
+| devStack.bootstrap.enabled | bool | `true` | Run a Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki. The Job is removed once it succeeds; a failed Job is kept for inspection. |
 | devStack.bootstrap.hooks | string | `"post-install,post-upgrade"` | Helm hooks the Job runs on. Set to `post-install` to stop upgrades from re-adding default grants that were revoked in a persistent Fuseki. |
 | devStack.bootstrap.image.pullPolicy | string | `"IfNotPresent"` |  |
 | devStack.bootstrap.image.repository | string | `"curlimages/curl"` |  |

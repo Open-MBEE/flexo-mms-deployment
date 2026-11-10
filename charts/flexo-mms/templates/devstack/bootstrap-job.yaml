@@ -11,7 +11,7 @@ metadata:
   annotations:
     helm.sh/hook: {{ $c.hooks | quote }}
     helm.sh/hook-weight: "0"
-    helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     {{- with (include "flexo-mms.annotations" .) }}
     {{- . | nindent 4 }}
     {{- end }}

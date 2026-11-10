@@ -687,7 +687,7 @@ devStack:
     affinity: {}
     extraEnv: []
   bootstrap:
-    # -- Run a Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki.
+    # -- Run a Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki. The Job is removed once it succeeds; a failed Job is kept for inspection.
     enabled: true
     # -- Helm hooks the Job runs on. Set to `post-install` to stop upgrades from re-adding default grants that were revoked in a persistent Fuseki.
     hooks: post-install,post-upgrade
