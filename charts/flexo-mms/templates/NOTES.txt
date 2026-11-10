@@ -1,0 +1,54 @@
+{{ .Chart.Name }} {{ .Chart.Version }} ({{ .Release.Name }}) installed in namespace {{ .Release.Namespace }}.
+
+Components:
+{{- if .Values.layer1.enabled }}
+  layer1  {{ include "flexo-mms.serviceUrl" (dict "root" . "component" "layer1" "port" .Values.layer1.service.port) }}
+{{- end }}
+{{- if .Values.auth.enabled }}
+  auth    {{ include "flexo-mms.serviceUrl" (dict "root" . "component" "auth" "port" .Values.auth.service.port) }}/login
+{{- end }}
+{{- if .Values.sso.enabled }}
+  sso     {{ include "flexo-mms.serviceUrl" (dict "root" . "component" "sso" "port" .Values.sso.service.port) }}{{ .Values.sso.contextPath }}
+{{- end }}
+{{- if .Values.store.enabled }}
+  store   {{ include "flexo-mms.serviceUrl" (dict "root" . "component" "store" "port" .Values.store.service.port) }}/store
+{{- end }}
+{{- if .Values.ingress.enabled }}
+
+Ingress:
+{{- range .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ . }}/
+{{- end }}
+{{- end }}
+{{- if .Values.devStack.enabled }}
+
+The dev stack is enabled: Fuseki, MinIO and OpenLDAP run in this namespace with the
+well-known docker-compose credentials and {{ if .Values.devStack.fuseki.persistence.enabled }}a persistent{{ else }}an ephemeral (emptyDir){{ end }} quad store.
+Do not use these defaults for anything but development.
+
+Try it:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "flexo-mms.componentName" (dict "root" . "component" "auth") }} 8082:{{ .Values.auth.service.port }} &
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "flexo-mms.componentName" (dict "root" . "component" "layer1") }} 8080:{{ .Values.layer1.service.port }} &
+  TOKEN=$(curl -s -u {{ include "flexo-mms.tests.username" . }}:{{ include "flexo-mms.tests.password" . }} http://localhost:8082/login | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+  curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/orgs
+{{- else }}
+
+External backends in use:
+  quad store  {{ include "flexo-mms.quadStore.queryUrl" . }}
+{{- if .Values.store.enabled }}
+  S3          {{ default "AWS S3" (include "flexo-mms.s3.endpoint" .) }} / bucket {{ .Values.s3.bucket }}
+{{- end }}
+{{- if .Values.auth.enabled }}
+  LDAP        {{ include "flexo-mms.ldap.location" . }}
+{{- end }}
+
+{{- with (include "flexo-mms.missingSettings" .) }}
+
+WARNING: these values are empty and must be set for the release to work: {{ . }}
+{{- end }}
+
+Remember to load a bootstrap policy graph (see files/cluster.trig in this chart) into the quad store,
+rewritten to {{ include "flexo-mms.rootContext" . }}/, or no user will be authorized.
+{{- end }}
+
+Run the smoke test with:  helm test {{ .Release.Name }} -n {{ .Release.Namespace }}

@@ -1,0 +1,710 @@
+# Default values for flexo-mms.
+# Values documented with "# --" are rendered into README.md by helm-docs.
+
+global:
+  # -- Image pull secrets applied to every pod (names of existing Secrets).
+  imagePullSecrets: []
+
+# -- Override the chart name used in resource names.
+nameOverride: ""
+# -- Override the fully qualified release name used in resource names.
+fullnameOverride: ""
+# -- Labels added to every resource.
+commonLabels: {}
+# -- Annotations added to every resource.
+commonAnnotations: {}
+
+imagePullSecret:
+  # -- Create a `kubernetes.io/dockerconfigjson` Secret from the credentials below and attach it to every pod.
+  create: false
+  # -- Name of the created Secret (defaults to `<fullname>-dockerhub`).
+  name: ""
+  # -- Registry server the credentials belong to.
+  registry: https://index.docker.io/v1/
+  # -- Registry username.
+  username: ""
+  # -- Registry password or access token.
+  password: ""
+  # -- Registry e-mail (optional).
+  email: ""
+
+serviceAccount:
+  # -- Create a ServiceAccount shared by all Flexo MMS pods.
+  create: true
+  # -- Name of the ServiceAccount (defaults to the release fullname; `default` when `create=false` and empty).
+  name: ""
+  # -- Annotations for the ServiceAccount (e.g. IRSA / Workload Identity).
+  annotations: {}
+  # -- Mount the service-account token into pods. None of the services talk to the Kubernetes API.
+  automountServiceAccountToken: false
+
+# -- Pod-level security context applied to every pod (merged under each component's `podSecurityContext`).
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container-level security context applied to every container (merged under each component's `containerSecurityContext`).
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  privileged: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- `TZ` for every container.
+timezone: UTC
+
+jwt:
+  # -- JWT issuer (`JWT_DOMAIN`) shared by all services.
+  domain: http://flexo-mms-services
+  # -- JWT audience (`JWT_AUDIENCE`).
+  audience: flexo-mms-audience
+  # -- JWT realm (`JWT_REALM`).
+  realm: flexo-mms
+  # -- HMAC signing secret (`JWT_SECRET`); stored in a Secret. When empty, the dev stack uses the docker-compose value and a production install generates a random secret that is kept across upgrades.
+  secret: ""
+  # -- Name of an existing Secret holding the JWT secret instead of `jwt.secret`.
+  existingSecret: ""
+  # -- Key inside `jwt.existingSecret`.
+  existingSecretKey: JWT_SECRET
+  # -- JWKS endpoint for RS256 verification on layer1 (`JWT_JWKS_URL`). Defaults to the in-chart SSO service's JWKS when `sso.enabled=true`.
+  jwksUrl: ""
+
+logback:
+  # -- Logback `<included>` fragment mounted at `/mnt/config/logback/loggers-include.xml` in layer1, auth and store.
+  fragment: |
+    <included>
+      <!-- additional appenders / logger levels, e.g. a SyslogAppender for Graylog -->
+    </included>
+  # -- Use an existing ConfigMap for the fragment instead of `logback.fragment`.
+  existingConfigMap: ""
+  # -- Key inside `logback.existingConfigMap`.
+  existingConfigMapKey: logback.xml
+
+quadStore:
+  # -- SPARQL query endpoint (`FLEXO_MMS_QUERY_URL`). Defaults to the in-chart Fuseki when `devStack.enabled=true`.
+  queryUrl: ""
+  # -- SPARQL update endpoint (`FLEXO_MMS_UPDATE_URL`).
+  updateUrl: ""
+  # -- Optional master/primary query endpoint for read-after-write consistency (`FLEXO_MMS_MASTER_QUERY_URL`).
+  masterQueryUrl: ""
+  # -- Graph Store Protocol endpoint (`FLEXO_MMS_GRAPH_STORE_PROTOCOL_URL`).
+  graphStoreProtocolUrl: ""
+
+s3:
+  # -- S3 region (`S3_REGION`).
+  region: us-east-1
+  # -- Bucket used by the store service (`S3_BUCKET`).
+  bucket: load
+  # -- S3 endpoint (`S3_ENDPOINT`). Defaults to the in-chart MinIO when `devStack.enabled=true`; leave empty for AWS S3.
+  endpoint: ""
+  # -- Access key id; stored in a Secret. Defaults to the dev-stack MinIO root user when `devStack.enabled=true`. Leave both keys empty to use the AWS default credential chain (IRSA, instance profile).
+  accessKeyId: ""
+  # -- Secret access key; stored in a Secret.
+  secretAccessKey: ""
+  # -- Existing Secret holding the S3 credentials instead of `s3.accessKeyId`/`s3.secretAccessKey`.
+  existingSecret: ""
+  # -- Keys inside `s3.existingSecret`.
+  existingSecretKeys:
+    accessKeyId: AWS_ACCESS_KEY_ID
+    secretAccessKey: AWS_SECRET_ACCESS_KEY
+
+ldap:
+  # -- LDAP URL (`LDAP_LOCATION`). Defaults to the in-chart OpenLDAP when `devStack.enabled=true`.
+  location: ""
+  # -- LDAP base DN (`LDAP_BASE`). Defaults to `devStack.openldap.root` when `devStack.enabled=true`.
+  base: ""
+  # -- User DN pattern relative to the base (`LDAP_USER_PATTERN`).
+  userPattern: cn=%s,ou=users
+  # -- Prefix for user ids in Flexo MMS (`LDAP_USER_NAMESPACE`).
+  userNamespace: ldap/user/
+  # -- Group search filter (`LDAP_GROUP_SEARCH_FILTER`).
+  groupSearchFilter: (&(objectclass=group)(member=%s)(|(%s)))
+  # -- Group naming attribute (`LDAP_GROUP_ATTRIBUTE`).
+  groupAttribute: cn
+  # -- Prefix for group ids in Flexo MMS (`LDAP_GROUP_NAMESPACE`).
+  groupNamespace: ldap/group/
+  # -- SPARQL endpoint the auth service reads groups from (`LDAP_GROUP_STORE_URI`). Defaults to `quadStore.queryUrl`.
+  groupStoreUri: ""
+  # -- Root context the auth service uses for group IRIs (`LDAP_GROUP_STORE_CONTEXT`). Defaults to `<layer1.rootContext>/`.
+  groupStoreContext: ""
+
+layer1:
+  # -- Deploy the layer1 (model/API) service.
+  enabled: true
+  image:
+    # -- Image repository.
+    repository: openmbee/flexo-mms-layer1-service
+    # -- Image tag.
+    tag: v0.3.1
+    # -- Image pull policy.
+    pullPolicy: IfNotPresent
+  # -- Number of replicas (ignored when `autoscaling.enabled=true`).
+  replicaCount: 1
+  # -- Root IRI of this Flexo MMS cluster (`FLEXO_MMS_ROOT_CONTEXT`); all org/repo/user IRIs are minted under it and the dev-stack bootstrap graph is rewritten to it. Set it to the public URL in production.
+  rootContext: http://layer1-service
+  # -- Instance id used in commit metadata (`FLEXO_MMS_SERVICE_ID`); defaults to `<fullname>-layer1`.
+  serviceId: ""
+  # -- Store-service URL (`FLEXO_MMS_STORE_SERVICE_URL`); defaults to the in-chart store service when `store.enabled=true`.
+  storeServiceUrl: ""
+  config:
+    # -- Store large artifacts in the store service instead of the quad store (`FLEXO_MMS_ARTIFACT_USE_STORE`).
+    artifactUseStore: true
+    # -- Answer 404 instead of 403 for unauthorized resources (`FLEXO_MMS_GLOMAR_RESPONSE`).
+    glomarResponse: true
+    # -- `FLEXO_MMS_MAXIMUM_LITERAL_SIZE_KIB` (empty keeps the service default).
+    maximumLiteralSizeKib: ""
+    # -- `FLEXO_MMS_GZIP_LITERALS_LARGER_THAN_KIB` (empty keeps the service default).
+    gzipLiteralsLargerThanKib: ""
+    # -- `FLEXO_MMS_ATOMIC_COMMIT`: `auto`, `always` or `never` (empty keeps the service default).
+    atomicCommit: ""
+    # -- `FLEXO_MMS_MUTEX_TTL_SECONDS` (empty keeps the service default).
+    mutexTtlSeconds: ""
+    # -- `FLEXO_MMS_SPARQL_REQUEST_TIMEOUT` in seconds (empty keeps the service default).
+    sparqlRequestTimeout: ""
+  # -- `JAVA_OPTS` for the JVM (heap defaults to 25% of the memory limit when unset).
+  javaOptions: ""
+  # -- Extra environment variables.
+  extraEnv: []
+  # -- Extra `envFrom` sources (ConfigMaps/Secrets).
+  extraEnvFrom: []
+  # -- Extra volumes.
+  extraVolumes: []
+  # -- Extra volume mounts.
+  extraVolumeMounts: []
+  service:
+    # -- Service type.
+    type: ClusterIP
+    # -- Service port.
+    port: 8080
+    # -- Service annotations.
+    annotations: {}
+  # -- Container resources.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+  # -- Startup probe (TCP; layer1 has no unauthenticated HTTP endpoint).
+  startupProbe:
+    enabled: true
+    tcpSocket:
+      port: http
+    periodSeconds: 5
+    failureThreshold: 36
+  # -- Liveness probe.
+  livenessProbe:
+    enabled: true
+    tcpSocket:
+      port: http
+    periodSeconds: 20
+    failureThreshold: 3
+  # -- Readiness probe.
+  readinessProbe:
+    enabled: true
+    tcpSocket:
+      port: http
+    periodSeconds: 10
+    failureThreshold: 3
+  # -- Pod annotations.
+  podAnnotations: {}
+  # -- Pod labels.
+  podLabels: {}
+  # -- Pod security context overrides for this component.
+  podSecurityContext: {}
+  # -- Container security context overrides for this component.
+  containerSecurityContext: {}
+  # -- Node selector.
+  nodeSelector: {}
+  # -- Tolerations.
+  tolerations: []
+  # -- Affinity.
+  affinity: {}
+  # -- Topology spread constraints.
+  topologySpreadConstraints: []
+  # -- Priority class name.
+  priorityClassName: ""
+  # -- Termination grace period in seconds.
+  terminationGracePeriodSeconds: 30
+  # -- Deployment update strategy.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  podDisruptionBudget:
+    # -- Create a PodDisruptionBudget.
+    enabled: false
+    # -- `minAvailable` (mutually exclusive with `maxUnavailable`).
+    minAvailable: 1
+    # -- `maxUnavailable`.
+    maxUnavailable: ""
+  autoscaling:
+    # -- Create a HorizontalPodAutoscaler.
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    # -- Target average CPU utilization (empty disables the metric).
+    targetCPUUtilizationPercentage: 80
+    # -- Target average memory utilization (empty disables the metric).
+    targetMemoryUtilizationPercentage: ""
+
+auth:
+  # -- Deploy the LDAP auth service (`GET /login` with basic auth returns a JWT).
+  enabled: true
+  image:
+    repository: openmbee/flexo-mms-auth-service
+    tag: v0.1.1
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  javaOptions: ""
+  extraEnv: []
+  extraEnvFrom: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 768Mi
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 5
+    failureThreshold: 36
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 20
+    failureThreshold: 3
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 10
+    failureThreshold: 3
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  containerSecurityContext: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+  priorityClassName: ""
+  terminationGracePeriodSeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+    maxUnavailable: ""
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: ""
+
+sso:
+  # -- Deploy the OIDC SSO auth service (Spring Boot) under `/sso`.
+  enabled: false
+  image:
+    repository: openmbee/flexo-mms-sso-auth-service
+    tag: beta-1
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  # -- Servlet context path (`SERVER_SERVLET_CONTEXT_PATH`); also used for the Ingress path and probes.
+  contextPath: /sso
+  oidc:
+    # -- Display name of the OIDC client registration.
+    clientName: Flexo MMS SSO
+    # -- OIDC client id (`SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID`).
+    clientId: ""
+    # -- OIDC client secret; stored in a Secret.
+    clientSecret: ""
+    # -- Existing Secret holding the client secret instead of `sso.oidc.clientSecret`.
+    existingSecret: ""
+    # -- Key inside `sso.oidc.existingSecret`.
+    existingSecretKey: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET
+    # -- Authorization grant type.
+    authorizationGrantType: authorization_code
+    # -- Redirect URI registered with the IdP. Defaults to `https://<first ingress host><contextPath>/login/oauth2/code/oidc` when the Ingress is enabled.
+    redirectUri: ""
+    # -- Requested scopes.
+    scope: openid,profile,email
+    # -- OIDC issuer URI (`SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI`). Required when `sso.enabled=true`.
+    issuerUri: ""
+    # -- Issuer URI for resource-server JWT validation (`SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI`); defaults to `sso.oidc.issuerUri`.
+    resourceServerIssuerUri: ""
+  datasource:
+    # -- JDBC URL (`SPRING_DATASOURCE_URL`). The SQLite default lives on an emptyDir and is lost on restart; point it at PostgreSQL for production.
+    url: jdbc:sqlite:/tmp/sso-database.db
+    # -- Datasource username.
+    username: ""
+    # -- Datasource password; stored in a Secret.
+    password: ""
+    # -- Existing Secret holding the datasource password instead of `sso.datasource.password`.
+    existingSecret: ""
+    # -- Key inside `sso.datasource.existingSecret`.
+    existingSecretKey: SPRING_DATASOURCE_PASSWORD
+  # -- ID-token claim used as the Flexo MMS user id (`FLEXO_SSO_AUTH_SERVICE_SSO_USER_ID_FIELD`).
+  userIdField: sid
+  # -- Token claim listing the user's groups (`FLEXO_SSO_AUTH_SERVICE_SSO_GROUP_CLAIMS_FIELD`).
+  groupClaimsField: groups
+  # -- `JAVA_TOOL_OPTIONS` for the JVM.
+  javaOptions: ""
+  extraEnv: []
+  extraEnvFrom: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 384Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /sso/actuator/health
+      port: http
+    periodSeconds: 5
+    failureThreshold: 60
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /sso/actuator/health
+      port: http
+    periodSeconds: 20
+    failureThreshold: 3
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /sso/actuator/health
+      port: http
+    periodSeconds: 10
+    failureThreshold: 3
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  containerSecurityContext: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+  priorityClassName: ""
+  terminationGracePeriodSeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+    maxUnavailable: ""
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: ""
+
+store:
+  # -- Deploy the artifact store service (S3 backed).
+  enabled: true
+  image:
+    repository: openmbee/flexo-mms-store-service
+    tag: v0.2.0
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  javaOptions: ""
+  extraEnv: []
+  extraEnvFrom: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  startupProbe:
+    enabled: true
+    tcpSocket:
+      port: http
+    periodSeconds: 5
+    failureThreshold: 36
+  livenessProbe:
+    enabled: true
+    tcpSocket:
+      port: http
+    periodSeconds: 20
+    failureThreshold: 3
+  readinessProbe:
+    enabled: true
+    tcpSocket:
+      port: http
+    periodSeconds: 10
+    failureThreshold: 3
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  containerSecurityContext: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+  priorityClassName: ""
+  terminationGracePeriodSeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+    maxUnavailable: ""
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: ""
+
+ingress:
+  # -- Create an Ingress routing `/` to layer1, `/login` to auth and `<sso.contextPath>` to sso (each only when enabled).
+  enabled: false
+  # -- IngressClass name.
+  className: ""
+  # -- Ingress annotations (defaults carry the ingress-nginx body-size/timeouts used by the reference deployment).
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 256m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  # -- Hostnames served by the Ingress.
+  hosts:
+    - flexo-mms.example.org
+  # -- `pathType` for the generated paths.
+  pathType: Prefix
+  # -- Additional paths appended to every host (`path`, `pathType`, `backend`).
+  extraPaths: []
+  # -- TLS configuration (`hosts`, `secretName`).
+  tls: []
+
+devStack:
+  # -- Deploy an in-cluster Fuseki, MinIO and OpenLDAP and wire the services to them. For development and evaluation only.
+  enabled: false
+  fuseki:
+    image:
+      repository: atomgraph/fuseki
+      tag: "4.6"
+      pullPolicy: IfNotPresent
+    # -- Dataset name; endpoints become `/<dataset>/sparql`, `/<dataset>/update`, `/<dataset>/data`.
+    dataset: ds
+    # -- `JAVA_OPTIONS` for the Fuseki JVM (the compose reference uses `-Xmx8192m -Xms8192m`).
+    javaOptions: -Xmx1024m -Xms512m
+    persistence:
+      # -- Persist the TDB2 database on a PersistentVolumeClaim; when false the quad store lives on an emptyDir and the bootstrap graph is reloaded by the Job on every install/upgrade.
+      enabled: false
+      # -- PVC size.
+      size: 8Gi
+      # -- StorageClass (empty uses the cluster default).
+      storageClass: ""
+      # -- Reuse an existing PVC instead of creating one.
+      existingClaim: ""
+      # -- PVC access modes.
+      accessModes:
+        - ReadWriteOnce
+    service:
+      type: ClusterIP
+      port: 3030
+    resources:
+      requests:
+        cpu: 250m
+        memory: 768Mi
+      limits:
+        cpu: "2"
+        memory: 1536Mi
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext: {}
+    containerSecurityContext: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraEnv: []
+  minio:
+    image:
+      repository: bitnamilegacy/minio
+      tag: 2025.7.23-debian-12-r5
+      pullPolicy: IfNotPresent
+    # -- Root user; also used as the store service's access key when `s3.accessKeyId` is empty.
+    rootUser: admintest
+    # -- Root password; stored in a Secret.
+    rootPassword: admintest
+    # -- Existing Secret with `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` instead of the values above.
+    existingSecret: ""
+    # -- Buckets created at startup (comma separated); should include `s3.bucket`.
+    defaultBuckets: load
+    persistence:
+      enabled: false
+      size: 8Gi
+      storageClass: ""
+      existingClaim: ""
+      accessModes:
+        - ReadWriteOnce
+    service:
+      type: ClusterIP
+      port: 9000
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+    podAnnotations: {}
+    podLabels: {}
+    # -- Bitnami images run as uid 1001.
+    podSecurityContext:
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+    containerSecurityContext: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraEnv: []
+  openldap:
+    image:
+      repository: bitnamilegacy/openldap
+      tag: 2.6.4
+      pullPolicy: IfNotPresent
+    # -- Directory root (`LDAP_ROOT`); also the default `ldap.base`.
+    root: dc=example,dc=org
+    # -- Admin username (`LDAP_ADMIN_USERNAME`).
+    adminUsername: admin
+    # -- Admin password; stored in a Secret.
+    adminPassword: adminpassword
+    # -- Existing Secret with `LDAP_ADMIN_PASSWORD` and `LDAP_PASSWORDS` instead of the values above.
+    existingSecret: ""
+    # -- Users created at startup (`LDAP_USERS`).
+    users:
+      - user01
+      - user02
+    # -- Passwords for `users`, same order; stored in a Secret.
+    passwords:
+      - password1
+      - password2
+    # -- OU the users live in (`LDAP_USER_DC`).
+    userDc: users
+    # -- Group all users are added to (`LDAP_GROUP`).
+    group: group01
+    persistence:
+      enabled: false
+      size: 1Gi
+      storageClass: ""
+      existingClaim: ""
+      accessModes:
+        - ReadWriteOnce
+    service:
+      type: ClusterIP
+      port: 1389
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext:
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+    # -- The Bitnami OpenLDAP entrypoint rewrites files under `/opt/bitnami/openldap`, so it cannot run read-only.
+    containerSecurityContext:
+      readOnlyRootFilesystem: false
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraEnv: []
+  bootstrap:
+    # -- Run a post-install/post-upgrade Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki.
+    enabled: true
+    image:
+      repository: curlimages/curl
+      tag: 8.14.1
+      pullPolicy: IfNotPresent
+    # -- Seconds the Job waits for Fuseki before giving up.
+    timeoutSeconds: 300
+    # -- Job backoff limit.
+    backoffLimit: 3
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+    podAnnotations: {}
+    podLabels: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+tests:
+  # -- Render the `helm test` Pod, which logs in through the auth service and lists orgs on layer1.
+  enabled: true
+  image:
+    repository: curlimages/curl
+    tag: 8.14.1
+    pullPolicy: IfNotPresent
+  # -- Username for the test login; defaults to the first dev-stack user when `devStack.enabled=true`. The test is skipped when no credentials are available.
+  username: ""
+  # -- Password for the test login.
+  password: ""
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi

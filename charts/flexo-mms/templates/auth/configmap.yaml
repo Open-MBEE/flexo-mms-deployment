@@ -1,0 +1,27 @@
+{{- if .Values.auth.enabled }}
+{{- $meta := dict "root" . "component" "auth" "version" (toString .Values.auth.image.tag) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  LDAP_LOCATION: {{ include "flexo-mms.ldap.location" . | quote }}
+  LDAP_BASE: {{ include "flexo-mms.ldap.base" . | quote }}
+  LDAP_USER_PATTERN: {{ .Values.ldap.userPattern | quote }}
+  LDAP_USER_NAMESPACE: {{ .Values.ldap.userNamespace | quote }}
+  LDAP_GROUP_SEARCH_FILTER: {{ .Values.ldap.groupSearchFilter | quote }}
+  LDAP_GROUP_ATTRIBUTE: {{ .Values.ldap.groupAttribute | quote }}
+  LDAP_GROUP_NAMESPACE: {{ .Values.ldap.groupNamespace | quote }}
+  LDAP_GROUP_STORE_URI: {{ default (include "flexo-mms.quadStore.queryUrl" .) .Values.ldap.groupStoreUri | quote }}
+  LDAP_GROUP_STORE_CONTEXT: {{ include "flexo-mms.ldap.groupStoreContext" . | quote }}
+  {{- with .Values.auth.javaOptions }}
+  JAVA_OPTS: {{ . | quote }}
+  {{- end }}
+{{- end }}

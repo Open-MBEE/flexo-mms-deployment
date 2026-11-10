@@ -1,0 +1,51 @@
+{{- if .Values.ingress.enabled }}
+{{- $root := . }}
+{{- $paths := list }}
+{{- if .Values.sso.enabled }}
+{{- $paths = append $paths (dict "path" .Values.sso.contextPath "component" "sso" "port" .Values.sso.service.port) }}
+{{- end }}
+{{- if .Values.auth.enabled }}
+{{- $paths = append $paths (dict "path" "/login" "component" "auth" "port" .Values.auth.service.port) }}
+{{- end }}
+{{- if .Values.layer1.enabled }}
+{{- $paths = append $paths (dict "path" "/" "component" "layer1" "port" .Values.layer1.service.port) }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flexo-mms.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.labels" . | nindent 4 }}
+  {{- $annotations := merge (default (dict) .Values.ingress.annotations) (default (dict) .Values.commonAnnotations) }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          {{- range $paths }}
+          - path: {{ .path }}
+            pathType: {{ $root.Values.ingress.pathType }}
+            backend:
+              service:
+                name: {{ include "flexo-mms.componentName" (dict "root" $root "component" .component) }}
+                port:
+                  number: {{ .port }}
+          {{- end }}
+          {{- with $root.Values.ingress.extraPaths }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+    {{- end }}
+{{- end }}

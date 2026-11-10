@@ -1,0 +1,49 @@
+{{- if .Values.layer1.enabled }}
+{{- $meta := dict "root" . "component" "layer1" "version" (toString .Values.layer1.image.tag) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  FLEXO_MMS_ROOT_CONTEXT: {{ include "flexo-mms.rootContext" . | quote }}
+  FLEXO_MMS_SERVICE_ID: {{ default (include "flexo-mms.componentName" $meta) .Values.layer1.serviceId | quote }}
+  FLEXO_MMS_QUERY_URL: {{ include "flexo-mms.quadStore.queryUrl" . | quote }}
+  FLEXO_MMS_UPDATE_URL: {{ include "flexo-mms.quadStore.updateUrl" . | quote }}
+  FLEXO_MMS_GRAPH_STORE_PROTOCOL_URL: {{ include "flexo-mms.quadStore.graphStoreProtocolUrl" . | quote }}
+  {{- with .Values.quadStore.masterQueryUrl }}
+  FLEXO_MMS_MASTER_QUERY_URL: {{ . | quote }}
+  {{- end }}
+  {{- with (include "flexo-mms.layer1.storeServiceUrl" .) }}
+  FLEXO_MMS_STORE_SERVICE_URL: {{ . | quote }}
+  {{- end }}
+  FLEXO_MMS_ARTIFACT_USE_STORE: {{ .Values.layer1.config.artifactUseStore | quote }}
+  FLEXO_MMS_GLOMAR_RESPONSE: {{ .Values.layer1.config.glomarResponse | quote }}
+  {{- with .Values.layer1.config.maximumLiteralSizeKib }}
+  FLEXO_MMS_MAXIMUM_LITERAL_SIZE_KIB: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.layer1.config.gzipLiteralsLargerThanKib }}
+  FLEXO_MMS_GZIP_LITERALS_LARGER_THAN_KIB: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.layer1.config.atomicCommit }}
+  FLEXO_MMS_ATOMIC_COMMIT: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.layer1.config.mutexTtlSeconds }}
+  FLEXO_MMS_MUTEX_TTL_SECONDS: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.layer1.config.sparqlRequestTimeout }}
+  FLEXO_MMS_SPARQL_REQUEST_TIMEOUT: {{ . | quote }}
+  {{- end }}
+  {{- with (include "flexo-mms.jwt.jwksUrl" .) }}
+  JWT_JWKS_URL: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.layer1.javaOptions }}
+  JAVA_OPTS: {{ . | quote }}
+  {{- end }}
+{{- end }}

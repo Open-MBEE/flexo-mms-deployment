@@ -1,0 +1,24 @@
+{{- if .Values.devStack.enabled }}
+{{- $c := .Values.devStack.minio }}
+{{- $ctx := dict "root" . "component" "minio" "values" $c }}
+{{- $secret := include "flexo-mms.minio.secretName" . }}
+{{- $env := printf "- name: MINIO_DEFAULT_BUCKETS\n  value: %s\n- name: MINIO_ROOT_USER\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: MINIO_ROOT_USER\n- name: MINIO_ROOT_PASSWORD\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: MINIO_ROOT_PASSWORD" ($c.defaultBuckets | quote) $secret $secret }}
+{{- $volumes := printf "%s\n- name: minio-tmp\n  emptyDir: {}\n- name: mc-home\n  emptyDir: {}\n- name: minio-home\n  emptyDir: {}" (include "flexo-mms.devStack.dataVolume" $ctx) }}
+{{- $mounts := "- name: data\n  mountPath: /bitnami/minio/data\n- name: minio-tmp\n  mountPath: /opt/bitnami/minio/tmp\n- name: mc-home\n  mountPath: /.mc\n- name: minio-home\n  mountPath: /.minio" }}
+{{- $checksums := dict "secret" (include (print .Template.BasePath "/devstack/minio-secret.yaml") . | sha256sum) }}
+{{- include "flexo-mms.deployment" (dict
+  "root" .
+  "component" "minio"
+  "values" $c
+  "port" 9000
+  "env" $env
+  "volumes" $volumes
+  "volumeMounts" $mounts
+  "checksums" $checksums) }}
+---
+{{ include "flexo-mms.service" $ctx }}
+{{- with (include "flexo-mms.devStack.pvc" $ctx) }}
+---
+{{ . }}
+{{- end }}
+{{- end }}

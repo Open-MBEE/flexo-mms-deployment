@@ -1,0 +1,18 @@
+{{- if and .Values.devStack.enabled .Values.devStack.bootstrap.enabled }}
+{{- $meta := dict "root" . "component" "bootstrap" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  # The shipped graph is minted under http://layer1-service/; rewrite it to the configured root context.
+  cluster.trig: |
+    {{- .Files.Get "files/cluster.trig" | replace "http://layer1-service/" (printf "%s/" (include "flexo-mms.rootContext" .)) | nindent 4 }}
+{{- end }}

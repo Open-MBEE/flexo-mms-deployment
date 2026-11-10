@@ -1,0 +1,3 @@
+{{- if .Values.store.enabled }}
+{{- include "flexo-mms.pdb" (dict "root" . "component" "store" "values" .Values.store) }}
+{{- end }}

@@ -1,0 +1,90 @@
+{{- if and .Values.devStack.enabled .Values.devStack.bootstrap.enabled }}
+{{- $c := .Values.devStack.bootstrap }}
+{{- $meta := dict "root" . "component" "bootstrap" "version" (toString $c.image.tag) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    {{- with (include "flexo-mms.annotations" .) }}
+    {{- . | nindent 4 }}
+    {{- end }}
+spec:
+  backoffLimit: {{ $c.backoffLimit }}
+  template:
+    metadata:
+      labels:
+        {{- include "flexo-mms.componentSelectorLabels" $meta | nindent 8 }}
+        {{- with $c.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with $c.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      restartPolicy: OnFailure
+      {{- include "flexo-mms.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "flexo-mms.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
+      securityContext:
+        {{- include "flexo-mms.podSecurityContext" (dict "root" . "values" $c) | nindent 8 }}
+      containers:
+        - name: bootstrap
+          image: {{ include "flexo-mms.image" $c.image }}
+          imagePullPolicy: {{ $c.image.pullPolicy }}
+          securityContext:
+            {{- include "flexo-mms.containerSecurityContext" (dict "root" . "values" $c) | nindent 12 }}
+          env:
+            - name: FUSEKI_URL
+              value: {{ include "flexo-mms.fusekiUrl" . | quote }}
+            - name: DATASET_URL
+              value: {{ include "flexo-mms.fusekiDatasetUrl" . | quote }}
+            - name: TIMEOUT_SECONDS
+              value: {{ $c.timeoutSeconds | quote }}
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              waited=0
+              until curl -sf "$FUSEKI_URL/\$/ping" >/dev/null; do
+                if [ "$waited" -ge "$TIMEOUT_SECONDS" ]; then echo "timed out waiting for $FUSEKI_URL"; exit 1; fi
+                sleep 2; waited=$((waited+2))
+              done
+              echo "loading cluster.trig into $DATASET_URL"
+              curl -sfS -X POST -H 'Content-Type: application/trig' --data-binary @/bootstrap/cluster.trig "$DATASET_URL"
+              echo
+              curl -sfS -G "$DATASET_URL/sparql" --data-urlencode 'query=SELECT (COUNT(*) AS ?quads) WHERE { GRAPH ?g { ?s ?p ?o } }' -H 'Accept: text/csv'
+          resources:
+            {{- toYaml $c.resources | nindent 12 }}
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: bootstrap
+          configMap:
+            name: {{ include "flexo-mms.componentName" $meta }}
+        - name: tmp
+          emptyDir: {}
+      {{- with $c.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $c.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $c.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
