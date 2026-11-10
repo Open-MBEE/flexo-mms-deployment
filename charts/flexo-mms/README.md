@@ -124,8 +124,10 @@ Kubernetes: `>=1.25.0-0`
 | auth.readinessProbe.periodSeconds | int | `10` |  |
 | auth.replicaCount | int | `1` |  |
 | auth.resources.limits.cpu | string | `"1"` |  |
+| auth.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | auth.resources.limits.memory | string | `"768Mi"` |  |
 | auth.resources.requests.cpu | string | `"100m"` |  |
+| auth.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | auth.resources.requests.memory | string | `"256Mi"` |  |
 | auth.service.annotations | object | `{}` |  |
 | auth.service.port | int | `8080` |  |
@@ -146,7 +148,8 @@ Kubernetes: `>=1.25.0-0`
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true}` | Container-level security context applied to every container (merged under each component's `containerSecurityContext`). |
 | devStack.bootstrap.affinity | object | `{}` |  |
 | devStack.bootstrap.backoffLimit | int | `3` | Job backoff limit. |
-| devStack.bootstrap.enabled | bool | `true` | Run a post-install/post-upgrade Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki. |
+| devStack.bootstrap.enabled | bool | `true` | Run a Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki. |
+| devStack.bootstrap.hooks | string | `"post-install,post-upgrade"` | Helm hooks the Job runs on. Set to `post-install` to stop upgrades from re-adding default grants that were revoked in a persistent Fuseki. |
 | devStack.bootstrap.image.pullPolicy | string | `"IfNotPresent"` |  |
 | devStack.bootstrap.image.repository | string | `"curlimages/curl"` |  |
 | devStack.bootstrap.image.tag | string | `"8.14.1"` |  |
@@ -154,8 +157,10 @@ Kubernetes: `>=1.25.0-0`
 | devStack.bootstrap.podAnnotations | object | `{}` |  |
 | devStack.bootstrap.podLabels | object | `{}` |  |
 | devStack.bootstrap.resources.limits.cpu | string | `"200m"` |  |
+| devStack.bootstrap.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | devStack.bootstrap.resources.limits.memory | string | `"128Mi"` |  |
 | devStack.bootstrap.resources.requests.cpu | string | `"10m"` |  |
+| devStack.bootstrap.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | devStack.bootstrap.resources.requests.memory | string | `"32Mi"` |  |
 | devStack.bootstrap.timeoutSeconds | int | `300` | Seconds the Job waits for Fuseki before giving up. |
 | devStack.bootstrap.tolerations | list | `[]` |  |
@@ -178,8 +183,10 @@ Kubernetes: `>=1.25.0-0`
 | devStack.fuseki.podLabels | object | `{}` |  |
 | devStack.fuseki.podSecurityContext | object | `{}` |  |
 | devStack.fuseki.resources.limits.cpu | string | `"2"` |  |
+| devStack.fuseki.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | devStack.fuseki.resources.limits.memory | string | `"1536Mi"` |  |
 | devStack.fuseki.resources.requests.cpu | string | `"250m"` |  |
+| devStack.fuseki.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | devStack.fuseki.resources.requests.memory | string | `"768Mi"` |  |
 | devStack.fuseki.service.port | int | `3030` |  |
 | devStack.fuseki.service.type | string | `"ClusterIP"` |  |
@@ -202,8 +209,10 @@ Kubernetes: `>=1.25.0-0`
 | devStack.minio.podLabels | object | `{}` |  |
 | devStack.minio.podSecurityContext | object | `{"fsGroup":1001,"runAsGroup":1001,"runAsUser":1001}` | Bitnami images run as uid 1001. |
 | devStack.minio.resources.limits.cpu | string | `"1"` |  |
+| devStack.minio.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | devStack.minio.resources.limits.memory | string | `"512Mi"` |  |
 | devStack.minio.resources.requests.cpu | string | `"100m"` |  |
+| devStack.minio.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | devStack.minio.resources.requests.memory | string | `"256Mi"` |  |
 | devStack.minio.rootPassword | string | `"admintest"` | Root password; stored in a Secret. |
 | devStack.minio.rootUser | string | `"admintest"` | Root user; also used as the store service's access key when `s3.accessKeyId` is empty. |
@@ -213,7 +222,7 @@ Kubernetes: `>=1.25.0-0`
 | devStack.openldap.adminPassword | string | `"adminpassword"` | Admin password; stored in a Secret. |
 | devStack.openldap.adminUsername | string | `"admin"` | Admin username (`LDAP_ADMIN_USERNAME`). |
 | devStack.openldap.affinity | object | `{}` |  |
-| devStack.openldap.containerSecurityContext | object | `{"readOnlyRootFilesystem":false}` | The Bitnami OpenLDAP entrypoint rewrites files under `/opt/bitnami/openldap`, so it cannot run read-only. |
+| devStack.openldap.containerSecurityContext | object | `{"capabilities":{"add":["NET_BIND_SERVICE"],"drop":["ALL"]},"readOnlyRootFilesystem":false}` | The entrypoint rewrites files under `/opt/bitnami/openldap` (no read-only root) and `slapd` carries file capability `cap_net_bind_service`, which must stay in the bounding set for the binary to exec. |
 | devStack.openldap.existingSecret | string | `""` | Existing Secret with `LDAP_ADMIN_PASSWORD` and `LDAP_PASSWORDS` instead of the values above. |
 | devStack.openldap.extraEnv | list | `[]` |  |
 | devStack.openldap.group | string | `"group01"` | Group all users are added to (`LDAP_GROUP`). |
@@ -229,12 +238,12 @@ Kubernetes: `>=1.25.0-0`
 | devStack.openldap.persistence.storageClass | string | `""` |  |
 | devStack.openldap.podAnnotations | object | `{}` |  |
 | devStack.openldap.podLabels | object | `{}` |  |
-| devStack.openldap.podSecurityContext.fsGroup | int | `1001` |  |
-| devStack.openldap.podSecurityContext.runAsGroup | int | `1001` |  |
-| devStack.openldap.podSecurityContext.runAsUser | int | `1001` |  |
+| devStack.openldap.podSecurityContext | object | `{"fsGroup":1001,"runAsGroup":0,"runAsUser":1001}` | The Bitnami image runs as uid 1001 with gid 0 (its directories are root-group writable). |
 | devStack.openldap.resources.limits.cpu | string | `"500m"` |  |
+| devStack.openldap.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | devStack.openldap.resources.limits.memory | string | `"256Mi"` |  |
 | devStack.openldap.resources.requests.cpu | string | `"50m"` |  |
+| devStack.openldap.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | devStack.openldap.resources.requests.memory | string | `"128Mi"` |  |
 | devStack.openldap.root | string | `"dc=example,dc=org"` | Directory root (`LDAP_ROOT`); also the default `ldap.base`. |
 | devStack.openldap.service.port | int | `1389` |  |
@@ -298,7 +307,7 @@ Kubernetes: `>=1.25.0-0`
 | layer1.priorityClassName | string | `""` | Priority class name. |
 | layer1.readinessProbe | object | `{"enabled":true,"failureThreshold":3,"periodSeconds":10,"tcpSocket":{"port":"http"}}` | Readiness probe. |
 | layer1.replicaCount | int | `1` | Number of replicas (ignored when `autoscaling.enabled=true`). |
-| layer1.resources | object | `{"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"250m","memory":"512Mi"}}` | Container resources. |
+| layer1.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"2Gi","memory":"2Gi"},"requests":{"cpu":"250m","ephemeral-storage":"256Mi","memory":"512Mi"}}` | Container resources. |
 | layer1.rootContext | string | `"http://layer1-service"` | Root IRI of this Flexo MMS cluster (`FLEXO_MMS_ROOT_CONTEXT`); all org/repo/user IRIs are minted under it and the dev-stack bootstrap graph is rewritten to it. Set it to the public URL in production. |
 | layer1.service.annotations | object | `{}` | Service annotations. |
 | layer1.service.port | int | `8080` | Service port. |
@@ -318,7 +327,7 @@ Kubernetes: `>=1.25.0-0`
 | ldap.groupStoreUri | string | `""` | SPARQL endpoint the auth service reads groups from (`LDAP_GROUP_STORE_URI`). Defaults to `quadStore.queryUrl`. |
 | ldap.location | string | `""` | LDAP URL (`LDAP_LOCATION`). Defaults to the in-chart OpenLDAP when `devStack.enabled=true`. |
 | ldap.userNamespace | string | `"ldap/user/"` | Prefix for user ids in Flexo MMS (`LDAP_USER_NAMESPACE`). |
-| ldap.userPattern | string | `"cn=%s,ou=users"` | User DN pattern relative to the base (`LDAP_USER_PATTERN`). |
+| ldap.userPattern | string | `""` | User DN pattern relative to the base (`LDAP_USER_PATTERN`). Defaults to `cn=%s,ou=users` (`ou=` + `devStack.openldap.userDc` with the dev stack). |
 | logback.existingConfigMap | string | `""` | Use an existing ConfigMap for the fragment instead of `logback.fragment`. |
 | logback.existingConfigMapKey | string | `"logback.xml"` | Key inside `logback.existingConfigMap`. |
 | logback.fragment | string | `"<included>\n  <!-- additional appenders / logger levels, e.g. a SyslogAppender for Graylog -->\n</included>\n"` | Logback `<included>` fragment mounted at `/mnt/config/logback/loggers-include.xml` in layer1, auth and store. |
@@ -364,7 +373,7 @@ Kubernetes: `>=1.25.0-0`
 | sso.javaOptions | string | `""` | `JAVA_TOOL_OPTIONS` for the JVM. |
 | sso.livenessProbe.enabled | bool | `true` |  |
 | sso.livenessProbe.failureThreshold | int | `3` |  |
-| sso.livenessProbe.httpGet.path | string | `"/sso/actuator/health"` |  |
+| sso.livenessProbe.httpGet.path | string | `"{{ .Values.sso.contextPath }}/actuator/health"` |  |
 | sso.livenessProbe.httpGet.port | string | `"http"` |  |
 | sso.livenessProbe.periodSeconds | int | `20` |  |
 | sso.nodeSelector | object | `{}` |  |
@@ -387,20 +396,22 @@ Kubernetes: `>=1.25.0-0`
 | sso.priorityClassName | string | `""` |  |
 | sso.readinessProbe.enabled | bool | `true` |  |
 | sso.readinessProbe.failureThreshold | int | `3` |  |
-| sso.readinessProbe.httpGet.path | string | `"/sso/actuator/health"` |  |
+| sso.readinessProbe.httpGet.path | string | `"{{ .Values.sso.contextPath }}/actuator/health"` |  |
 | sso.readinessProbe.httpGet.port | string | `"http"` |  |
 | sso.readinessProbe.periodSeconds | int | `10` |  |
 | sso.replicaCount | int | `1` |  |
 | sso.resources.limits.cpu | string | `"1"` |  |
+| sso.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | sso.resources.limits.memory | string | `"1Gi"` |  |
 | sso.resources.requests.cpu | string | `"100m"` |  |
+| sso.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | sso.resources.requests.memory | string | `"384Mi"` |  |
 | sso.service.annotations | object | `{}` |  |
 | sso.service.port | int | `8080` |  |
 | sso.service.type | string | `"ClusterIP"` |  |
 | sso.startupProbe.enabled | bool | `true` |  |
 | sso.startupProbe.failureThreshold | int | `60` |  |
-| sso.startupProbe.httpGet.path | string | `"/sso/actuator/health"` |  |
+| sso.startupProbe.httpGet.path | string | `"{{ .Values.sso.contextPath }}/actuator/health"` |  |
 | sso.startupProbe.httpGet.port | string | `"http"` |  |
 | sso.startupProbe.periodSeconds | int | `5` |  |
 | sso.strategy.rollingUpdate.maxSurge | int | `1` |  |
@@ -444,8 +455,10 @@ Kubernetes: `>=1.25.0-0`
 | store.readinessProbe.tcpSocket.port | string | `"http"` |  |
 | store.replicaCount | int | `1` |  |
 | store.resources.limits.cpu | string | `"1"` |  |
+| store.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | store.resources.limits.memory | string | `"1Gi"` |  |
 | store.resources.requests.cpu | string | `"100m"` |  |
+| store.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | store.resources.requests.memory | string | `"256Mi"` |  |
 | store.service.annotations | object | `{}` |  |
 | store.service.port | int | `8080` |  |
@@ -466,8 +479,10 @@ Kubernetes: `>=1.25.0-0`
 | tests.image.tag | string | `"8.14.1"` |  |
 | tests.password | string | `""` | Password for the test login. |
 | tests.resources.limits.cpu | string | `"200m"` |  |
+| tests.resources.limits.ephemeral-storage | string | `"2Gi"` |  |
 | tests.resources.limits.memory | string | `"128Mi"` |  |
 | tests.resources.requests.cpu | string | `"10m"` |  |
+| tests.resources.requests.ephemeral-storage | string | `"256Mi"` |  |
 | tests.resources.requests.memory | string | `"32Mi"` |  |
 | tests.username | string | `""` | Username for the test login; defaults to the first dev-stack user when `devStack.enabled=true`. The test is skipped when no credentials are available. |
 | timezone | string | `"UTC"` | `TZ` for every container. |

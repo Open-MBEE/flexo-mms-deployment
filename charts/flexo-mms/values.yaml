@@ -119,8 +119,8 @@ ldap:
   location: ""
   # -- LDAP base DN (`LDAP_BASE`). Defaults to `devStack.openldap.root` when `devStack.enabled=true`.
   base: ""
-  # -- User DN pattern relative to the base (`LDAP_USER_PATTERN`).
-  userPattern: cn=%s,ou=users
+  # -- User DN pattern relative to the base (`LDAP_USER_PATTERN`). Defaults to `cn=%s,ou=users` (`ou=` + `devStack.openldap.userDc` with the dev stack).
+  userPattern: ""
   # -- Prefix for user ids in Flexo MMS (`LDAP_USER_NAMESPACE`).
   userNamespace: ldap/user/
   # -- Group search filter (`LDAP_GROUP_SEARCH_FILTER`).
@@ -189,9 +189,11 @@ layer1:
     requests:
       cpu: 250m
       memory: 512Mi
+      ephemeral-storage: 256Mi
     limits:
       cpu: "2"
       memory: 2Gi
+      ephemeral-storage: 2Gi
   # -- Startup probe (TCP; layer1 has no unauthenticated HTTP endpoint).
   startupProbe:
     enabled: true
@@ -277,9 +279,11 @@ auth:
     requests:
       cpu: 100m
       memory: 256Mi
+      ephemeral-storage: 256Mi
     limits:
       cpu: "1"
       memory: 768Mi
+      ephemeral-storage: 2Gi
   startupProbe:
     enabled: true
     httpGet:
@@ -387,27 +391,29 @@ sso:
     requests:
       cpu: 100m
       memory: 384Mi
+      ephemeral-storage: 256Mi
     limits:
       cpu: "1"
       memory: 1Gi
+      ephemeral-storage: 2Gi
   startupProbe:
     enabled: true
     httpGet:
-      path: /sso/actuator/health
+      path: "{{ .Values.sso.contextPath }}/actuator/health"
       port: http
     periodSeconds: 5
     failureThreshold: 60
   livenessProbe:
     enabled: true
     httpGet:
-      path: /sso/actuator/health
+      path: "{{ .Values.sso.contextPath }}/actuator/health"
       port: http
     periodSeconds: 20
     failureThreshold: 3
   readinessProbe:
     enabled: true
     httpGet:
-      path: /sso/actuator/health
+      path: "{{ .Values.sso.contextPath }}/actuator/health"
       port: http
     periodSeconds: 10
     failureThreshold: 3
@@ -458,9 +464,11 @@ store:
     requests:
       cpu: 100m
       memory: 256Mi
+      ephemeral-storage: 256Mi
     limits:
       cpu: "1"
       memory: 1Gi
+      ephemeral-storage: 2Gi
   startupProbe:
     enabled: true
     tcpSocket:
@@ -558,9 +566,11 @@ devStack:
       requests:
         cpu: 250m
         memory: 768Mi
+        ephemeral-storage: 256Mi
       limits:
         cpu: "2"
         memory: 1536Mi
+        ephemeral-storage: 2Gi
     podAnnotations: {}
     podLabels: {}
     podSecurityContext: {}
@@ -596,9 +606,11 @@ devStack:
       requests:
         cpu: 100m
         memory: 256Mi
+        ephemeral-storage: 256Mi
       limits:
         cpu: "1"
         memory: 512Mi
+        ephemeral-storage: 2Gi
     podAnnotations: {}
     podLabels: {}
     # -- Bitnami images run as uid 1001.
@@ -650,25 +662,35 @@ devStack:
       requests:
         cpu: 50m
         memory: 128Mi
+        ephemeral-storage: 256Mi
       limits:
         cpu: 500m
         memory: 256Mi
+        ephemeral-storage: 2Gi
     podAnnotations: {}
     podLabels: {}
+    # -- The Bitnami image runs as uid 1001 with gid 0 (its directories are root-group writable).
     podSecurityContext:
       runAsUser: 1001
-      runAsGroup: 1001
+      runAsGroup: 0
       fsGroup: 1001
-    # -- The Bitnami OpenLDAP entrypoint rewrites files under `/opt/bitnami/openldap`, so it cannot run read-only.
+    # -- The entrypoint rewrites files under `/opt/bitnami/openldap` (no read-only root) and `slapd` carries file capability `cap_net_bind_service`, which must stay in the bounding set for the binary to exec.
     containerSecurityContext:
       readOnlyRootFilesystem: false
+      capabilities:
+        drop:
+          - ALL
+        add:
+          - NET_BIND_SERVICE
     nodeSelector: {}
     tolerations: []
     affinity: {}
     extraEnv: []
   bootstrap:
-    # -- Run a post-install/post-upgrade Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki.
+    # -- Run a Job that loads the bootstrap policy graph (`files/cluster.trig`, rewritten to `layer1.rootContext`) into Fuseki.
     enabled: true
+    # -- Helm hooks the Job runs on. Set to `post-install` to stop upgrades from re-adding default grants that were revoked in a persistent Fuseki.
+    hooks: post-install,post-upgrade
     image:
       repository: curlimages/curl
       tag: 8.14.1
@@ -681,9 +703,11 @@ devStack:
       requests:
         cpu: 10m
         memory: 32Mi
+        ephemeral-storage: 256Mi
       limits:
         cpu: 200m
         memory: 128Mi
+        ephemeral-storage: 2Gi
     podAnnotations: {}
     podLabels: {}
     nodeSelector: {}
@@ -705,6 +729,8 @@ tests:
     requests:
       cpu: 10m
       memory: 32Mi
+      ephemeral-storage: 256Mi
     limits:
       cpu: 200m
       memory: 128Mi
+      ephemeral-storage: 2Gi

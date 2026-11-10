@@ -1470,6 +1470,9 @@
             },
             "affinity": {
               "type": "object"
+            },
+            "hooks": {
+              "type": "string"
             }
           },
           "additionalProperties": false

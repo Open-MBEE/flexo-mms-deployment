@@ -26,7 +26,8 @@ Chart name, release fullname and chart label.
 Name of a component resource: <fullname>-<component>. Expects (dict "root" $ "component" "layer1").
 */}}
 {{- define "flexo-mms.componentName" -}}
-{{- printf "%s-%s" (include "flexo-mms.fullname" .root) .component | trunc 63 | trimSuffix "-" }}
+{{- $suffix := printf "-%s" .component }}
+{{- printf "%s%s" (include "flexo-mms.fullname" .root | trunc (int (sub 63 (len $suffix))) | trimSuffix "-") $suffix }}
 {{- end }}
 
 {{/*
@@ -187,6 +188,13 @@ Root context without a trailing slash, and the auth service's group-store contex
 {{- end }}
 {{- end }}
 
+{{- define "flexo-mms.ldap.userPattern" -}}
+{{- if .Values.ldap.userPattern }}{{ .Values.ldap.userPattern }}
+{{- else if .Values.devStack.enabled }}{{ printf "cn=%%s,ou=%s" .Values.devStack.openldap.userDc }}
+{{- else }}cn=%s,ou=users
+{{- end }}
+{{- end }}
+
 {{- define "flexo-mms.ldap.base" -}}
 {{- if .Values.ldap.base }}{{ .Values.ldap.base }}
 {{- else if .Values.devStack.enabled }}{{ .Values.devStack.openldap.root }}
@@ -262,7 +270,7 @@ SSO helpers.
 
 {{- define "flexo-mms.sso.redirectUri" -}}
 {{- if .Values.sso.oidc.redirectUri }}{{ .Values.sso.oidc.redirectUri }}
-{{- else if and .Values.ingress.enabled .Values.ingress.hosts }}{{ printf "https://%s%s/login/oauth2/code/oidc" (first .Values.ingress.hosts) .Values.sso.contextPath }}
+{{- else if and .Values.ingress.enabled .Values.ingress.hosts }}{{ printf "%s://%s%s/login/oauth2/code/oidc" (ternary "https" "http" (not (empty .Values.ingress.tls))) (first .Values.ingress.hosts) .Values.sso.contextPath }}
 {{- end }}
 {{- end }}
 

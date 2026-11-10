@@ -14,7 +14,7 @@ metadata:
 data:
   LDAP_LOCATION: {{ include "flexo-mms.ldap.location" . | quote }}
   LDAP_BASE: {{ include "flexo-mms.ldap.base" . | quote }}
-  LDAP_USER_PATTERN: {{ .Values.ldap.userPattern | quote }}
+  LDAP_USER_PATTERN: {{ include "flexo-mms.ldap.userPattern" . | quote }}
   LDAP_USER_NAMESPACE: {{ .Values.ldap.userNamespace | quote }}
   LDAP_GROUP_SEARCH_FILTER: {{ .Values.ldap.groupSearchFilter | quote }}
   LDAP_GROUP_ATTRIBUTE: {{ .Values.ldap.groupAttribute | quote }}

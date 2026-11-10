@@ -9,7 +9,7 @@ metadata:
   labels:
     {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
   annotations:
-    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook: {{ $c.hooks | quote }}
     helm.sh/hook-weight: "0"
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     {{- with (include "flexo-mms.annotations" .) }}
