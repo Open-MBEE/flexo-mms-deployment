@@ -8,7 +8,8 @@ data:
   SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_SCOPE: openid,profile,email
   SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI:
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:
-  # Required: the image default (/tmp/sqlite) does not exist; a SQLite file must live under /tmp.
+  # Required: the image default (/tmp/sqlite) does not exist. Only /tmp is writable and it is an
+  # emptyDir, so a SQLite file there is lost with the pod; use PostgreSQL to keep the data.
   SPRING_DATASOURCE_URL:
   SPRING_DATASOURCE_USERNAME:
   SERVER_SERVLET_CONTEXT_PATH: /sso
