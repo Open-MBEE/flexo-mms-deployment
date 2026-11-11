@@ -711,6 +711,9 @@
         "groupClaimsField": {
           "type": "string"
         },
+        "jwtUserIdField": {
+          "type": "string"
+        },
         "javaOptions": {
           "type": "string"
         },

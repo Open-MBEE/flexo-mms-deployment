@@ -375,8 +375,10 @@ sso:
     existingSecretKey: SPRING_DATASOURCE_PASSWORD
   # -- ID-token claim used as the Flexo MMS user id (`FLEXO_SSO_AUTH_SERVICE_SSO_USER_ID_FIELD`).
   userIdField: sid
-  # -- Token claim listing the user's groups (`FLEXO_SSO_AUTH_SERVICE_SSO_GROUP_CLAIMS_FIELD`).
+  # -- Token claim listing the user's groups (`FLEXO_SSO_AUTH_SERVICE_GROUP_CLAIMS_FIELD`).
   groupClaimsField: groups
+  # -- Access-token claim used as the user id for API-key requests (`FLEXO_SSO_AUTH_SERVICE_JWT_USER_ID_FIELD`); the image defaults to `sub` when empty.
+  jwtUserIdField: ""
   # -- `JAVA_TOOL_OPTIONS` for the JVM.
   javaOptions: ""
   extraEnv: []

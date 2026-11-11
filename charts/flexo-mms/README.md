@@ -366,11 +366,12 @@ Kubernetes: `>=1.25.0-0`
 | sso.extraEnvFrom | list | `[]` |  |
 | sso.extraVolumeMounts | list | `[]` |  |
 | sso.extraVolumes | list | `[]` |  |
-| sso.groupClaimsField | string | `"groups"` | Token claim listing the user's groups (`FLEXO_SSO_AUTH_SERVICE_SSO_GROUP_CLAIMS_FIELD`). |
+| sso.groupClaimsField | string | `"groups"` | Token claim listing the user's groups (`FLEXO_SSO_AUTH_SERVICE_GROUP_CLAIMS_FIELD`). |
 | sso.image.pullPolicy | string | `"IfNotPresent"` |  |
 | sso.image.repository | string | `"openmbee/flexo-mms-sso-auth-service"` |  |
 | sso.image.tag | string | `"beta-1"` |  |
 | sso.javaOptions | string | `""` | `JAVA_TOOL_OPTIONS` for the JVM. |
+| sso.jwtUserIdField | string | `""` | Access-token claim used as the user id for API-key requests (`FLEXO_SSO_AUTH_SERVICE_JWT_USER_ID_FIELD`); the image defaults to `sub` when empty. |
 | sso.livenessProbe.enabled | bool | `true` |  |
 | sso.livenessProbe.failureThreshold | int | `3` |  |
 | sso.livenessProbe.httpGet.path | string | `"{{ .Values.sso.contextPath }}/actuator/health"` |  |

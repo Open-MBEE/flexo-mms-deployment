@@ -28,7 +28,10 @@ data:
   SPRING_DATASOURCE_USERNAME: {{ . | quote }}
   {{- end }}
   FLEXO_SSO_AUTH_SERVICE_SSO_USER_ID_FIELD: {{ .Values.sso.userIdField | quote }}
-  FLEXO_SSO_AUTH_SERVICE_SSO_GROUP_CLAIMS_FIELD: {{ .Values.sso.groupClaimsField | quote }}
+  FLEXO_SSO_AUTH_SERVICE_GROUP_CLAIMS_FIELD: {{ .Values.sso.groupClaimsField | quote }}
+  {{- with .Values.sso.jwtUserIdField }}
+  FLEXO_SSO_AUTH_SERVICE_JWT_USER_ID_FIELD: {{ . | quote }}
+  {{- end }}
   {{- with .Values.sso.javaOptions }}
   JAVA_TOOL_OPTIONS: {{ . | quote }}
   {{- end }}
