@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flexo-mms-sso-auth-service
+  namespace: flexo-mms
+spec:
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-sso-auth-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-flexo-mms-flexo-mms-sso-auth-service
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: jwt-config
+            optional: false
+        - configMapRef:
+            name: os-config
+        - configMapRef:
+            name: sso-config
+            optional: false
+        - secretRef:
+            name: sso-secret
+            optional: false
+        image: openmbee/flexo-mms-sso-auth-service:beta-1
+        imagePullPolicy: Always
+        name: flexo-mms-sso-auth-service
+        resources:
+          limits:
+            cpu: "1"
+            ephemeral-storage: 2Gi
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 256Mi
+            memory: 384Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1001
+          runAsNonRoot: true
+          # UID/GID of the image's "appuser"; runAsNonRoot cannot verify a non-numeric USER.
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        volumeMounts:
+        - mountPath: /mnt/config/logback/
+          name: logback-config-map
+        - mountPath: /tmp
+          name: tmp
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: dockerhub
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1001
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 256
+          items:
+          - key: logback.xml
+            path: loggers-include.xml
+          name: logback-config
+          optional: false
+        name: logback-config-map
+      - emptyDir:
+          sizeLimit: 1Gi
+        name: tmp

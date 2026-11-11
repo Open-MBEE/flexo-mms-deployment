@@ -1,0 +1,23 @@
+apiVersion: v1
+data:
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_NAME: Flexo MMS SSO
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID:
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_AUTHORIZATION_GRANT_TYPE: authorization_code
+  # Placeholder: use the Ingress host; must match the redirect URI registered with the IdP.
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_REDIRECT_URI: https://flexo-mms.openmbee.org/sso/login/oauth2/code/oidc
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_SCOPE: openid,profile,email
+  SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI:
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:
+  # Required: the image default (/tmp/sqlite) does not exist. Only /tmp is writable and it is an
+  # emptyDir, so a SQLite file there is lost with the pod; use PostgreSQL to keep the data.
+  SPRING_DATASOURCE_URL:
+  SPRING_DATASOURCE_USERNAME:
+  SERVER_SERVLET_CONTEXT_PATH: /sso
+  FLEXO_SSO_AUTH_SERVICE_SSO_USER_ID_FIELD:
+  # Claim read as the user id from bearer JWTs; falls back to sub when unset.
+  FLEXO_SSO_AUTH_SERVICE_JWT_USER_ID_FIELD:
+  FLEXO_SSO_AUTH_SERVICE_GROUP_CLAIMS_FIELD:
+kind: ConfigMap
+metadata:
+  name: sso-config
+  namespace: flexo-mms
