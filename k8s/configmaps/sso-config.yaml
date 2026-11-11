@@ -14,7 +14,9 @@ data:
   SPRING_DATASOURCE_USERNAME:
   SERVER_SERVLET_CONTEXT_PATH: /sso
   FLEXO_SSO_AUTH_SERVICE_SSO_USER_ID_FIELD:
-  FLEXO_SSO_AUTH_SERVICE_SSO_GROUP_CLAIMS_FIELD:
+  # Claim used as the user name in issued JWTs; falls back to sub when unset.
+  FLEXO_SSO_AUTH_SERVICE_JWT_USER_ID_FIELD:
+  FLEXO_SSO_AUTH_SERVICE_GROUP_CLAIMS_FIELD:
 kind: ConfigMap
 metadata:
   name: sso-config
