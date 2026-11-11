@@ -28,6 +28,9 @@ spec:
         - configMapRef:
             name: sso-config
             optional: false
+        - secretRef:
+            name: sso-secret
+            optional: false
         image: openmbee/flexo-mms-sso-auth-service:beta-1
         imagePullPolicy: Always
         name: flexo-mms-sso-auth-service
