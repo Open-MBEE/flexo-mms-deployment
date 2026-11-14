@@ -1,0 +1,24 @@
+{{- if .Values.store.enabled }}
+{{- $name := include "flexo-mms.componentName" (dict "root" . "component" "store") }}
+{{- $checksums := dict
+  "config" (include (print .Template.BasePath "/store/configmap.yaml") . | sha256sum)
+  "jwt" (include (print .Template.BasePath "/secret-jwt.yaml") . | sha256sum)
+  "s3" (include (print .Template.BasePath "/store/secret.yaml") . | sha256sum)
+  "logback" (include (print .Template.BasePath "/configmap-logback.yaml") . | sha256sum) }}
+{{- $envFrom := printf "- configMapRef:\n    name: %s" $name }}
+{{- $env := include "flexo-mms.jwtEnv" . }}
+{{- with (include "flexo-mms.s3.secretName" .) }}
+{{- $env = printf "%s\n- name: AWS_ACCESS_KEY_ID\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: %s\n- name: AWS_SECRET_ACCESS_KEY\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: %s"
+  $env . (include "flexo-mms.s3.accessKeyIdKey" $) . (include "flexo-mms.s3.secretAccessKeyKey" $) }}
+{{- end }}
+{{- include "flexo-mms.deployment" (dict
+  "root" .
+  "component" "store"
+  "values" .Values.store
+  "port" 8080
+  "env" $env
+  "envFrom" $envFrom
+  "volumes" (include "flexo-mms.logbackVolume" .)
+  "volumeMounts" (include "flexo-mms.logbackVolumeMount" .)
+  "checksums" $checksums) }}
+{{- end }}

@@ -1,0 +1,23 @@
+{{- if .Values.store.enabled }}
+{{- $meta := dict "root" . "component" "store" "version" (toString .Values.store.image.tag) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  S3_REGION: {{ .Values.s3.region | quote }}
+  S3_BUCKET: {{ .Values.s3.bucket | quote }}
+  {{- with (include "flexo-mms.s3.endpoint" .) }}
+  S3_ENDPOINT: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.store.javaOptions }}
+  JAVA_OPTS: {{ . | quote }}
+  {{- end }}
+{{- end }}

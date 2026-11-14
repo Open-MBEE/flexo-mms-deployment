@@ -1,0 +1,38 @@
+{{- if .Values.sso.enabled }}
+{{- $meta := dict "root" . "component" "sso" "version" (toString .Values.sso.image.tag) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  SERVER_PORT: "8080"
+  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.sso.contextPath | quote }}
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_NAME: {{ .Values.sso.oidc.clientName | quote }}
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID: {{ required "sso.oidc.clientId is required when sso.enabled=true" .Values.sso.oidc.clientId | quote }}
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_AUTHORIZATION_GRANT_TYPE: {{ .Values.sso.oidc.authorizationGrantType | quote }}
+  {{- with (include "flexo-mms.sso.redirectUri" .) }}
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_REDIRECT_URI: {{ . | quote }}
+  {{- end }}
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_SCOPE: {{ .Values.sso.oidc.scope | quote }}
+  SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI: {{ required "sso.oidc.issuerUri is required when sso.enabled=true" .Values.sso.oidc.issuerUri | quote }}
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: {{ default .Values.sso.oidc.issuerUri .Values.sso.oidc.resourceServerIssuerUri | quote }}
+  SPRING_DATASOURCE_URL: {{ .Values.sso.datasource.url | quote }}
+  {{- with .Values.sso.datasource.username }}
+  SPRING_DATASOURCE_USERNAME: {{ . | quote }}
+  {{- end }}
+  FLEXO_SSO_AUTH_SERVICE_SSO_USER_ID_FIELD: {{ .Values.sso.userIdField | quote }}
+  FLEXO_SSO_AUTH_SERVICE_GROUP_CLAIMS_FIELD: {{ .Values.sso.groupClaimsField | quote }}
+  {{- with .Values.sso.jwtUserIdField }}
+  FLEXO_SSO_AUTH_SERVICE_JWT_USER_ID_FIELD: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.sso.javaOptions }}
+  JAVA_TOOL_OPTIONS: {{ . | quote }}
+  {{- end }}
+{{- end }}

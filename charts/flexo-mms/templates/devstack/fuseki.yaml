@@ -1,0 +1,25 @@
+{{- if .Values.devStack.enabled }}
+{{- $c := .Values.devStack.fuseki }}
+{{- $ctx := dict "root" . "component" "fuseki" "values" $c }}
+{{- $env := printf "- name: JAVA_OPTIONS\n  value: %s" ($c.javaOptions | quote) }}
+{{- $args := list "--update" "--tdb2" (printf "--loc=/fuseki/databases/%s" $c.dataset) (printf "/%s" $c.dataset) }}
+{{- $volumes := printf "%s\n- name: logs\n  emptyDir: {}" (include "flexo-mms.devStack.dataVolume" $ctx) }}
+{{- $mounts := printf "- name: data\n  mountPath: /fuseki/databases/%s\n- name: logs\n  mountPath: /fuseki/logs" $c.dataset }}
+{{- $values := merge (dict "args" $args) $c }}
+{{- include "flexo-mms.deployment" (dict
+  "root" .
+  "component" "fuseki"
+  "values" $values
+  "port" 3030
+  "args" $args
+  "env" $env
+  "volumes" $volumes
+  "volumeMounts" $mounts
+  "checksums" (dict)) }}
+---
+{{ include "flexo-mms.service" $ctx }}
+{{- with (include "flexo-mms.devStack.pvc" $ctx) }}
+---
+{{ . }}
+{{- end }}
+{{- end }}

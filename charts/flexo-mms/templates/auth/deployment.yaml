@@ -1,0 +1,18 @@
+{{- if .Values.auth.enabled }}
+{{- $name := include "flexo-mms.componentName" (dict "root" . "component" "auth") }}
+{{- $checksums := dict
+  "config" (include (print .Template.BasePath "/auth/configmap.yaml") . | sha256sum)
+  "jwt" (include (print .Template.BasePath "/secret-jwt.yaml") . | sha256sum)
+  "logback" (include (print .Template.BasePath "/configmap-logback.yaml") . | sha256sum) }}
+{{- $envFrom := printf "- configMapRef:\n    name: %s" $name }}
+{{- include "flexo-mms.deployment" (dict
+  "root" .
+  "component" "auth"
+  "values" .Values.auth
+  "port" 8080
+  "env" (include "flexo-mms.jwtEnv" .)
+  "envFrom" $envFrom
+  "volumes" (include "flexo-mms.logbackVolume" .)
+  "volumeMounts" (include "flexo-mms.logbackVolumeMount" .)
+  "checksums" $checksums) }}
+{{- end }}

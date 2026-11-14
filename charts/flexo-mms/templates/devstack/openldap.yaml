@@ -1,0 +1,24 @@
+{{- if .Values.devStack.enabled }}
+{{- $c := .Values.devStack.openldap }}
+{{- $ctx := dict "root" . "component" "openldap" "values" $c }}
+{{- $secret := include "flexo-mms.openldap.secretName" . }}
+{{- $env := printf "- name: LDAP_PORT_NUMBER\n  value: \"1389\"\n- name: LDAP_ROOT\n  value: %s\n- name: LDAP_ADMIN_USERNAME\n  value: %s\n- name: LDAP_USERS\n  value: %s\n- name: LDAP_USER_DC\n  value: %s\n- name: LDAP_GROUP\n  value: %s\n- name: LDAP_ADMIN_PASSWORD\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: LDAP_ADMIN_PASSWORD\n- name: LDAP_PASSWORDS\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: LDAP_PASSWORDS"
+  ($c.root | quote) ($c.adminUsername | quote) (join "," $c.users | quote) ($c.userDc | quote) ($c.group | quote) $secret $secret }}
+{{- $mounts := "- name: data\n  mountPath: /bitnami/openldap" }}
+{{- $checksums := dict "secret" (include (print .Template.BasePath "/devstack/openldap-secret.yaml") . | sha256sum) }}
+{{- include "flexo-mms.deployment" (dict
+  "root" .
+  "component" "openldap"
+  "values" $c
+  "port" 1389
+  "env" $env
+  "volumes" (include "flexo-mms.devStack.dataVolume" $ctx)
+  "volumeMounts" $mounts
+  "checksums" $checksums) }}
+---
+{{ include "flexo-mms.service" $ctx }}
+{{- with (include "flexo-mms.devStack.pvc" $ctx) }}
+---
+{{ . }}
+{{- end }}
+{{- end }}

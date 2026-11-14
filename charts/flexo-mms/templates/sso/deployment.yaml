@@ -1,0 +1,25 @@
+{{- if .Values.sso.enabled }}
+{{- $name := include "flexo-mms.componentName" (dict "root" . "component" "sso") }}
+{{- $checksums := dict
+  "config" (include (print .Template.BasePath "/sso/configmap.yaml") . | sha256sum)
+  "jwt" (include (print .Template.BasePath "/secret-jwt.yaml") . | sha256sum)
+  "secret" (include (print .Template.BasePath "/sso/secret.yaml") . | sha256sum) }}
+{{- $envFrom := printf "- configMapRef:\n    name: %s" $name }}
+{{- $env := include "flexo-mms.jwtEnv" . }}
+{{- if or .Values.sso.oidc.existingSecret .Values.sso.oidc.clientSecret }}
+{{- $env = printf "%s\n- name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: %s" $env (default (include "flexo-mms.sso.secretName" .) .Values.sso.oidc.existingSecret) .Values.sso.oidc.existingSecretKey }}
+{{- else }}
+{{- fail "sso.oidc.clientSecret or sso.oidc.existingSecret is required when sso.enabled=true" }}
+{{- end }}
+{{- if or .Values.sso.datasource.existingSecret .Values.sso.datasource.password }}
+{{- $env = printf "%s\n- name: SPRING_DATASOURCE_PASSWORD\n  valueFrom:\n    secretKeyRef:\n      name: %s\n      key: %s" $env (default (include "flexo-mms.sso.secretName" .) .Values.sso.datasource.existingSecret) .Values.sso.datasource.existingSecretKey }}
+{{- end }}
+{{- include "flexo-mms.deployment" (dict
+  "root" .
+  "component" "sso"
+  "values" .Values.sso
+  "port" 8080
+  "env" $env
+  "envFrom" $envFrom
+  "checksums" $checksums) }}
+{{- end }}

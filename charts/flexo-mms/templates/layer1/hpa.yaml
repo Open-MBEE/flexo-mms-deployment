@@ -1,0 +1,3 @@
+{{- if .Values.layer1.enabled }}
+{{- include "flexo-mms.hpa" (dict "root" . "component" "layer1" "values" .Values.layer1) }}
+{{- end }}

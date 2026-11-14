@@ -1,0 +1,17 @@
+{{- if and (not .Values.logback.existingConfigMap) (or .Values.layer1.enabled .Values.auth.enabled .Values.store.enabled) }}
+{{- $meta := dict "root" . "component" "logback" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flexo-mms.logback.configMapName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  {{ .Values.logback.existingConfigMapKey }}: |
+    {{- .Values.logback.fragment | nindent 4 }}
+{{- end }}

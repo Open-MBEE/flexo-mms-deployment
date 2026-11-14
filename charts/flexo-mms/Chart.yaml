@@ -1,0 +1,28 @@
+apiVersion: v2
+name: flexo-mms
+description: Flexo MMS (Model Management System) microservices - layer1, LDAP auth, SSO auth and artifact store - with an optional in-cluster dev stack (Fuseki, MinIO, OpenLDAP).
+type: application
+version: 0.1.0
+appVersion: "v0.3.1"
+kubeVersion: ">=1.25.0-0"
+home: https://www.openmbee.org/
+icon: https://www.openmbee.org/img/openmbee-logo.svg
+keywords:
+  - openmbee
+  - flexo
+  - mms
+  - sysml
+  - model-management
+  - rdf
+  - sparql
+sources:
+  - https://github.com/Open-MBEE/flexo-mms-deployment
+  - https://github.com/Open-MBEE/flexo-mms-layer1-service
+  - https://github.com/Open-MBEE/flexo-mms-auth-service
+  - https://github.com/Open-MBEE/flexo-mms-sso-auth-service
+  - https://github.com/Open-MBEE/flexo-mms-store-service
+maintainers:
+  - name: OpenMBEE
+    url: https://www.openmbee.org/
+annotations:
+  artifacthub.io/license: Apache-2.0

@@ -1,0 +1,77 @@
+{{- $username := include "flexo-mms.tests.username" . }}
+{{- $password := include "flexo-mms.tests.password" . }}
+{{- if and .Values.tests.enabled .Values.auth.enabled .Values.layer1.enabled (or .Values.tests.existingSecret (and $username $password)) }}
+{{- $meta := dict "root" . "component" "test" "version" (toString .Values.tests.image.tag) }}
+{{- $credentials := default (printf "%s-credentials" (include "flexo-mms.componentName" $meta)) .Values.tests.existingSecret }}
+{{- if not .Values.tests.existingSecret }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  {{- with (include "flexo-mms.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+type: kubernetes.io/basic-auth
+stringData:
+  username: {{ $username | quote }}
+  password: {{ $password | quote }}
+{{- end }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "flexo-mms.componentName" $meta }}-login
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexo-mms.componentLabels" $meta | nindent 4 }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  {{- include "flexo-mms.imagePullSecrets" . | nindent 2 }}
+  serviceAccountName: {{ include "flexo-mms.serviceAccountName" . }}
+  automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
+  securityContext:
+    {{- include "flexo-mms.podSecurityContext" (dict "root" . "values" .Values.tests) | nindent 4 }}
+  containers:
+    - name: login
+      image: {{ include "flexo-mms.image" .Values.tests.image }}
+      imagePullPolicy: {{ .Values.tests.image.pullPolicy }}
+      securityContext:
+        {{- include "flexo-mms.containerSecurityContext" (dict "root" . "values" .Values.tests) | nindent 8 }}
+      env:
+        - name: AUTH_URL
+          value: {{ include "flexo-mms.serviceUrl" (dict "root" . "component" "auth" "port" .Values.auth.service.port) | quote }}
+        - name: LAYER1_URL
+          value: {{ include "flexo-mms.serviceUrl" (dict "root" . "component" "layer1" "port" .Values.layer1.service.port) | quote }}
+      command:
+        - /bin/sh
+        - -ec
+        - |
+          user="$(cat /credentials/username)"
+          echo "logging in as $user at $AUTH_URL/login"
+          token="$(curl -sfS -u "$user:$(cat /credentials/password)" "$AUTH_URL/login" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+          [ -n "$token" ] || { echo "no token in login response"; exit 1; }
+          echo "listing orgs at $LAYER1_URL/orgs"
+          curl -sfS -o /dev/null -w 'HTTP %{http_code}\n' -H "Authorization: Bearer $token" -H 'Accept: text/turtle' "$LAYER1_URL/orgs"
+      resources:
+        {{- toYaml .Values.tests.resources | nindent 8 }}
+      volumeMounts:
+        - name: credentials
+          mountPath: /credentials
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+  volumes:
+    - name: credentials
+      secret:
+        secretName: {{ $credentials }}
+    - name: tmp
+      emptyDir: {}
+{{- end }}

@@ -1,0 +1,3 @@
+{{- if .Values.auth.enabled }}
+{{- include "flexo-mms.hpa" (dict "root" . "component" "auth" "values" .Values.auth) }}
+{{- end }}
